@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart AgroBot | AI Agriculture Assistant — UNITAR Project</title>
+  <meta name="description" content="Conversational AI chatbot for agriculture assistance. Decision tree covering crop disease, weather, fertilizer, and emergency contacts. University project." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --bg-main: #f0fdf4;
+      --chat-bg: #f8fafc;
+      --bot-msg: #f1f5f9;
+      --user-msg: #10b981;
+      --text-dark: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --font-main: 'Roboto', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--bg-main);
+      font-family: var(--font-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-image: url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1920&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      padding: 20px;
+    }
+
+    .app-container {
+      width: 100%; max-width: 480px; height: 88vh;
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      border: 4px solid #fff;
+    }
+
+    /* Header */
+    .chat-header {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      padding: 16px 20px;
+      display: flex; align-items: center; gap: 14px;
+      flex-shrink: 0;
+    }
+    .bot-avatar {
+      width: 46px; height: 46px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+    .header-info h1 { font-size: 1.1rem; font-weight: 700; margin-bottom: 2px; }
+    .header-info p { font-size: 0.78rem; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 6px; }
+    .status-dot { width: 7px; height: 7px; background: #a7f3d0; border-radius: 50%; animation: pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
+    .scope-badge {
+      margin-left: auto;
+      background: rgba(0,0,0,0.2);
+      font-size: 0.65rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    /* Chat Area */
+    .chat-area {
+      flex: 1; padding: 18px;
+      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 14px;
+      background: var(--chat-bg);
+      scroll-behavior: smooth;
+    }
+
+    .msg-group { display: flex; flex-direction: column; gap: 4px; max-width: 88%; }
+    .msg-group.bot { align-self: flex-start; }
+    .msg-group.user { align-self: flex-end; align-items: flex-end; }
+
+    .msg {
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .msg.bot {
+      background: var(--bot-msg);
+      color: var(--text-dark);
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .msg.user {
+      background: var(--user-msg);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-time { font-size: 0.7rem; color: var(--text-light); margin: 2px 4px; }
+
+    /* Crop card */
+    .crop-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; margin-top: 6px; width: 240px;
+    }
+    .crop-card img { width: 100%; height: 110px; object-fit: cover; }
+    .crop-card-body { padding: 10px; }
+    .crop-card-title { font-weight: 700; font-size: 0.88rem; margin-bottom: 3px; color: var(--text-dark); }
+    .crop-card-desc { font-size: 0.78rem; color: var(--text-light); }
+
+    /* Quick reply chips */
+    .chips-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; max-width: 320px; }
+    .chip {
+      padding: 7px 13px;
+      background: #fff;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+      font-family: var(--font-main);
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip:hover { background: var(--primary); color: #fff; }
+
+    /* Typing indicator */
+    .typing-group { align-self: flex-start; }
+    .typing-bubble {
+      background: var(--bot-msg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      padding: 12px 18px;
+      display: flex; gap: 4px; align-items: center;
+    }
+    .typing-dot {
+      width: 7px; height: 7px;
+      background: var(--text-light);
+      border-radius: 50%;
+      animation: typingBounce 1.2s ease infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%,80%,100%{ transform: translateY(0); }
+      40%{ transform: translateY(-6px); }
+    }
+
+    /* Input area */
+    .input-area {
+      background: #fff; padding: 14px 16px;
+      display: flex; gap: 10px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .chat-input {
+      flex: 1; padding: 12px 18px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 99px;
+      font-family: var(--font-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--primary); }
+    .send-btn {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff; border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .send-btn:hover { background: var(--primary-dark); }
+    .send-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* Back pill */
+    .back-btn-pill {
+      position: fixed; bottom: 24px; left: 24px; z-index: 150;
+      background: rgba(255,255,255,0.92); border: 2px solid var(--primary);
+      color: var(--primary-dark); padding: 12px 22px; border-radius: 99px;
+      font-weight: 700; font-size: 0.82rem;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2); text-decoration: none;
+      transition: all .2s ease;
+    }
+    .back-btn-pill:hover { background: var(--primary); color: #fff; }
+
+    @media (max-width: 540px) {
+      body { padding: 0; align-items: flex-end; }
+      .app-container { height: 100dvh; border-radius: 0; border: none; max-width: 100%; }
+      .back-btn-pill { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container" role="main" aria-label="AgroBot Chat">
+    <header class="chat-header">
+      <div class="bot-avatar" aria-hidden="true">🌱</div>
+      <div class="header-info">
+        <h1>Smart AgroBot</h1>
+        <p><span class="status-dot" aria-hidden="true"></span> Online — Agriculture Assistant</p>
+      </div>
+      <div class="scope-badge">Demo<br>Simulated AI</div>
+    </header>
+
+    <div class="chat-area" id="chatArea" aria-live="polite" aria-label="Chat messages"></div>
+
+    <div class="input-area">
+      <input type="text" class="chat-input" id="chatInput" placeholder="Type your farming question..." aria-label="Type a message" autocomplete="off" />
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <a href="/" class="back-btn-pill" aria-label="Return to portfolio">
+    <span>←</span> Portfolio Home
+  </a>
+
+  <script>
+    // ===================================================
+    // DECISION TREE DATA
+    // ===================================================
+    const RESPONSES = {
+      // Greetings
+      greet: {
+        text: "Hello! I'm your Smart AgroBot 🌿. I can help you with:\n\n• Crop disease diagnosis\n• Weather & seasonal advice\n• Fertilizer dosage\n• Pest control\n• Emergency agri-contacts\n\nWhat's happening on your farm today?",
+        chips: ['🍅 Tomato Disease', '🌾 Rice Problem', '🌽 Corn Issue', '💧 Watering Advice', '🌡️ Weather Tips', '📞 Emergency Contacts']
+      },
+
+      tomato: {
+        text: "Tomato issues are common. What symptoms do you see?",
+        chips: ['Yellow leaves with brown spots', 'Wilting & drooping', 'Black bottom rot', 'White powdery coating', 'Holes in fruit'],
+        card: { title: 'Tomato Crop', desc: 'Identify your symptoms below.', img: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?q=80&w=400&auto=format&fit=crop' }
+      },
+
+      tomato_blight: {
+        text: "Based on your description, this sounds like **Early Blight** (Alternaria solani).\n\n✅ Recommended actions:\n• Apply copper-based fungicide\n• Remove infected lower leaves\n• Avoid overhead watering\n• Rotate crops next season\n\nWould you like a dosage calculation?",
+        chips: ['Calculate fungicide dosage', 'Other tomato problem', 'Main menu']
+      },
+
+      tomato_wilt: {
+        text: "Wilting in tomatoes often indicates **Fusarium Wilt** or root issues.\n\n✅ Recommended actions:\n• Check soil drainage\n• Inspect roots for brown discoloration\n• Apply Trichoderma-based biocontrol\n• Avoid wetting leaves when watering",
+        chips: ['What is Trichoderma?', 'Check another crop', 'Main menu']
+      },
+
+      rice: {
+        text: "Rice issues detected. What symptoms are you observing?",
+        chips: ['Brown spots on leaves', 'Yellowing leaves', 'Neck rot / panicle loss', 'Stunted growth', 'White streaks on leaves'],
+        card: { title: 'Rice Crop', desc: 'Common rice diseases and conditions.', img: 'https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?q=80&w=400&auto=format&fit=crop' }
+      },
+
+      rice_blast: {
+        text: "This is consistent with **Rice Blast** (Magnaporthe oryzae) — the most destructive rice disease.\n\n✅ Recommended actions:\n• Apply tricyclazole or isoprothiolane fungicide\n• Drain field for 3–5 days\n• Apply silicon-based fertilizer to strengthen cell walls\n• Plant blast-resistant varieties next season",
+        chips: ['Dosage calculation', 'Other rice problem', 'Main menu']
+      },
+
+      corn: {
+        text: "Corn problem detected. What are you observing?",
+        chips: ['Gray leaf spot', 'Ear rot', 'Stalk rot / lodging', 'Armyworm damage', 'Nutrient deficiency'],
+        card: { title: 'Corn / Maize', desc: 'Common corn/maize conditions.', img: 'https://images.unsplash.com/photo-1601593346740-925612772716?q=80&w=400&auto=format&fit=crop' }
+      },
+
+      fertilizer: {
+        text: "To calculate fertilizer dosage, I need two values:\n\n1️⃣ What crop are you growing?\n2️⃣ What is your field size (hectares)?\n\nFor a quick reference — typical NPK rates per hectare:\n• Paddy (Rice): 90kg N, 30kg P₂O₅, 30kg K₂O\n• Corn: 120kg N, 60kg P₂O₅, 60kg K₂O\n• Tomato: 150kg N, 80kg P₂O₅, 100kg K₂O\n\nType your crop and field size for a personalized estimate.",
+        chips: ['Rice — 1 hectare', 'Corn — 2 hectares', 'Tomato — 0.5 hectares', 'Main menu']
+      },
+
+      fertilizer_rice_1ha: {
+        text: "✅ **Fertilizer Plan for 1 Hectare of Rice:**\n\n📦 Urea (N source): 196 kg\n📦 Triple Superphosphate (P): 65 kg\n📦 Muriate of Potash (K): 50 kg\n\n⏰ Application schedule:\n• Basal (planting): 1/3 N + all P + all K\n• Tillering (30 days): 1/3 N\n• Panicle initiation (60 days): 1/3 N\n\n⚠️ Note: Adjust based on soil test results. Consult your local agronomist.",
+        chips: ['Another crop', 'Weather advice', 'Main menu']
+      },
+
+      weather: {
+        text: "🌤️ **General Seasonal Farming Tips:**\n\n☀️ **Dry season:**\n• Increase irrigation frequency\n• Apply mulch to retain soil moisture\n• Watch for spider mite outbreaks\n\n🌧️ **Wet season:**\n• Ensure proper field drainage\n• Monitor for fungal diseases\n• Harvest before late-season rains\n\n❄️ **Cold nights:**\n• Cover sensitive seedlings\n• Delay planting cold-sensitive crops\n\nNote: For accurate local forecasts, contact your nearest meteorological department.",
+        chips: ['Pest control tips', 'Fertilizer advice', 'Main menu']
+      },
+
+      pest: {
+        text: "🐛 **Common Pest Control Guide:**\n\n• **Aphids:** Neem oil spray or introduce ladybugs\n• **Whiteflies:** Yellow sticky traps + Pyrethrins\n• **Armyworms:** Bacillus thuringiensis (Bt) spray\n• **Mealybugs:** Imidacloprid soil drench\n• **Fruit borers:** Pheromone traps + Spinosad\n\n⚠️ Always follow label safety instructions when applying pesticides. Wear protective equipment.",
+        chips: ['Calculate pesticide dose', 'Disease diagnosis', 'Main menu']
+      },
+
+      emergency: {
+        text: "📞 **Agriculture Emergency Contacts (Malaysia):**\n\n🌾 DOA Helpline: 1-800-88-6430\n🐄 DVS Livestock: 03-8870 2000\n🐟 DoFish (Fisheries): 03-6261 0379\n☠️ Poisoning Hotline: 04-765 9935 (PPP)\n🏥 General Emergency: 999\n\nFor crop insurance claims, contact:\nAGROBANK: 1300-88-2476\n\n⚠️ For active crop fires or flood emergencies, call 999 immediately.",
+        chips: ['Disease diagnosis', 'Fertilizer advice', 'Main menu']
+      },
+
+      dosage: {
+        text: "To calculate pesticide dosage:\n\n📐 **Formula:** Product Concentration × Field Area ÷ Recommended Rate\n\nExample: For copper fungicide at 2g/L concentration:\n• 0.25 ha field = 12.5 kg product needed\n• Mix at 2g per liter of water\n• Apply 600L spray volume per hectare\n\nAlways read the product label. Concentrations vary by brand.",
+        chips: ['Other crop issue', 'Emergency contacts', 'Main menu']
+      },
+
+      trichoderma: {
+        text: "**Trichoderma** is a naturally occurring soil fungus used as a biological control agent.\n\n✅ Benefits:\n• Suppresses soil-borne pathogens (Fusarium, Pythium)\n• Promotes root growth\n• Improves nutrient uptake\n• Safe for environment — no chemical residue\n\n🧪 Application: Mix 10g Trichoderma powder per liter of water. Drench into root zone every 3 weeks.",
+        chips: ['Other tomato problem', 'Pest control', 'Main menu']
+      },
+
+      default: {
+        text: "I understand you're asking about farming. I'm best at helping with:\n\n🍅 Crop diseases · 💊 Fertilizer dosages · 🌤️ Seasonal advice · 🐛 Pest control · 📞 Emergency contacts\n\nPlease try one of the quick options below, or rephrase your question.",
+        chips: ['🍅 Tomato Disease', '🌾 Rice Problem', '🌽 Corn Issue', '💧 Watering Advice', '📞 Emergency Contacts']
+      }
+    };
+
+    // Keyword routing
+    function detectIntent(text) {
+      const t = text.toLowerCase();
+      if (/hello|hi|hey|start|help/.test(t)) return 'greet';
+      if (/tomato/.test(t) && !/(yellow|spot|brown|wilt|rot|powder)/.test(t)) return 'tomato';
+      if (/yellow.*spot|brown.*spot|early blight|blight/.test(t)) return 'tomato_blight';
+      if (/wilt|droop|fusarium/.test(t)) return 'tomato_wilt';
+      if (/rice|paddy/.test(t) && !/(spot|brown|yellow|neck|stunt|white)/.test(t)) return 'rice';
+      if (/brown spot|rice blast|neck rot/.test(t)) return 'rice_blast';
+      if (/corn|maize/.test(t)) return 'corn';
+      if (/fertiliz|npk|nutrient|dosage/.test(t) && !/(rice|corn|tomato).*hectare/.test(t)) return 'fertilizer';
+      if (/rice.*1 hectare|rice.*1ha/.test(t)) return 'fertilizer_rice_1ha';
+      if (/weather|season|rain|dry|wet|climate/.test(t)) return 'weather';
+      if (/pest|insect|aphid|armyworm|worm|fly/.test(t)) return 'pest';
+      if (/emergency|contact|hotline|phone|call/.test(t)) return 'emergency';
+      if (/dosage|calculate|amount|how much/.test(t)) return 'dosage';
+      if (/trichoderma/.test(t)) return 'trichoderma';
+      if (/main menu|menu|back|start over|restart/.test(t)) return 'greet';
+      return 'default';
+    }
+
+    // ===================================================
+    // CHAT ENGINE
+    // ===================================================
+    let isTyping = false;
+
+    function getTime() {
+      const now = new Date();
+      return now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    }
+
+    function appendMsg(text, type, card, chips) {
+      const area = document.getElementById('chatArea');
+
+      const group = document.createElement('div');
+      group.className = `msg-group ${type}`;
+
+      // Handle newlines as <br>
+      const formatted = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+      const bubble = document.createElement('div');
+      bubble.className = `msg ${type}`;
+      bubble.innerHTML = formatted;
+      group.appendChild(bubble);
+
+      // Card
+      if (card) {
+        const cardEl = document.createElement('div');
+        cardEl.className = 'crop-card';
+        cardEl.innerHTML = `
+          <img src="${card.img}" alt="${card.title}" loading="lazy" />
+          <div class="crop-card-body">
+            <div class="crop-card-title">${card.title}</div>
+            <div class="crop-card-desc">${card.desc}</div>
+          </div>`;
+        group.appendChild(cardEl);
+      }
+
+      // Chips
+      if (chips && chips.length) {
+        const chipsRow = document.createElement('div');
+        chipsRow.className = 'chips-row';
+        chips.forEach(chip => {
+          const btn = document.createElement('button');
+          btn.className = 'chip';
+          btn.textContent = chip;
+          btn.onclick = () => {
+            // Remove all chip rows
+            document.querySelectorAll('.chips-row').forEach(r => r.remove());
+            sendText(chip);
+          };
+          chipsRow.appendChild(btn);
+        });
+        group.appendChild(chipsRow);
+      }
+
+      // Time
+      const timeEl = document.createElement('div');
+      timeEl.className = 'msg-time';
+      timeEl.textContent = getTime();
+      group.appendChild(timeEl);
+
+      area.appendChild(group);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function showTyping() {
+      const area = document.getElementById('chatArea');
+      const el = document.createElement('div');
+      el.className = 'msg-group bot typing-group';
+      el.id = 'typingIndicator';
+      el.innerHTML = `<div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+      area.appendChild(el);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function hideTyping() {
+      const el = document.getElementById('typingIndicator');
+      if (el) el.remove();
+    }
+
+    function botReply(text, card, chips) {
+      // Remove old chips
+      document.querySelectorAll('.chips-row').forEach(r => r.remove());
+      isTyping = true;
+      document.getElementById('sendBtn').disabled = true;
+      showTyping();
+      setTimeout(() => {
+        hideTyping();
+        appendMsg(text, 'bot', card, chips);
+        isTyping = false;
+        document.getElementById('sendBtn').disabled = false;
+      }, 600 + Math.random() * 400);
+    }
+
+    function sendText(text) {
+      if (!text.trim() || isTyping) return;
+      appendMsg(text, 'user');
+      const intent = detectIntent(text);
+      const resp = RESPONSES[intent] || RESPONSES.default;
+      botReply(resp.text, resp.card || null, resp.chips || null);
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      sendText(text);
+    }
+
+    document.getElementById('chatInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    // Welcome message on load
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const resp = RESPONSES.greet;
+        appendMsg(resp.text, 'bot', null, resp.chips);
+      }, 500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article | TechVibe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #047857;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --text: #111827;
+      --text-muted: #4b5563;
+      --border: #e5e7eb;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    
+    .logo span {
+      color: var(--primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--primary);
+    }
+
+    .subscribe-btn {
+      background-color: var(--text);
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background-color 0.2s;
+    }
+
+    .subscribe-btn:hover {
+      background-color: var(--primary);
+    }
+
+    /* Main Content */
+    main {
+      max-width: 1200px;
+      margin: 2.5rem auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 3rem;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Article Styles */
+    .article-header {
+      margin-bottom: 2rem;
+    }
+
+    .category-tag {
+      color: var(--primary);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+
+    .article-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .author-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-image: url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80');
+      background-size: cover;
+    }
+    
+    .author-info strong {
+      display: block;
+      color: var(--text);
+    }
+
+    .article-hero-img {
+      width: 100%;
+      height: 500px;
+      background-color: #f3f4f6;
+      background-size: cover;
+      background-position: center;
+      border-radius: 12px;
+      margin-bottom: 2.5rem;
+    }
+
+    .article-body {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: #374151;
+    }
+
+    .article-body p {
+      margin-bottom: 1.5rem;
+    }
+    
+    .article-body h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin: 3rem 0 1.5rem;
+      color: var(--text);
+    }
+    
+    .article-body blockquote {
+      border-left: 4px solid var(--primary);
+      padding-left: 1.5rem;
+      margin: 2rem 0;
+      font-style: italic;
+      font-size: 1.3rem;
+      color: var(--text);
+    }
+
+    /* Sidebar */
+    aside {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+
+    .widget {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .widget h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .popular-post {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .popular-post:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .popular-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    
+    .popular-title:hover {
+      color: var(--primary);
+    }
+
+    /* Newsletter */
+    .newsletter-widget {
+      background: var(--text);
+      color: white;
+      text-align: center;
+    }
+    
+    .newsletter-widget h3 {
+      border-bottom-color: rgba(255,255,255,0.2);
+    }
+
+    .newsletter-widget p {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      color: #9ca3af;
+    }
+
+    .newsletter-widget input {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #4b5563;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      margin-bottom: 0.75rem;
+    }
+
+    .newsletter-widget button {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .newsletter-widget button:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Modal & Toast */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--surface);
+      padding: 2.5rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+      text-align: center;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);
+    }
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--text);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      font-weight: 600;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Floating Back Button */
+    .back-to-portfolio {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      background: var(--surface);
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 1000;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border);
+    }
+
+    .back-to-portfolio:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">Tech<span>Vibe</span></a>
+      <nav class="nav-links">
+        <a href="index.html#ai">AI & Future</a>
+        <a href="index.html#gadgets">Gadgets</a>
+        <a href="index.html#software">Software</a>
+        <a href="index.html#reviews">Reviews</a>
+      </nav>
+      <a href="#" class="subscribe-btn" onclick="openModal(); return false;">Subscribe</a>
+    </div>
+  </header>
+
+  <main>
+    <article class="content-area" id="articleContainer">
+      <!-- Injected by JS -->
+    </article>
+
+    <aside>
+      <div class="widget">
+        <h3>Related Articles</h3>
+        
+        <div class="popular-post">
+          <div>
+            <a href="article.html?id=gadgets-1" class="popular-title">Apple's AR Glasses: A Developer's First Look</a>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Oct 22, 2026</p>
+          </div>
+        </div>
+
+        <div class="popular-post">
+          <div>
+            <a href="article.html?id=software-3" class="popular-title">5 Productivity Apps That Actually Use AI Well</a>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Oct 20, 2026</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget newsletter-widget" id="sidebarNewsletter">
+        <h3>TechVibe Weekly</h3>
+        <p>Get the latest tech news and deep dives delivered straight to your inbox.</p>
+        <input type="email" id="sidebarEmail" placeholder="Your email address">
+        <button onclick="handleSubscribe('sidebarEmail')">Subscribe</button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toastMsg">Action successful!</div>
+
+  <!-- Subscribe Modal -->
+  <div class="modal-overlay" id="subscribeModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1rem;">Join TechVibe</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Get exclusive insights delivered to your inbox.</p>
+      <input type="email" id="modalEmail" placeholder="Email Address" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 6px;">
+      <button onclick="handleSubscribe('modalEmail')" style="width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Subscribe Now</button>
+    </div>
+  </div>
+
+  <a href="/" class="back-to-portfolio">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Portfolio
+  </a>
+
+  <script>
+    const articlesDb = {
+      'ai-1': {
+        cat: 'Artificial Intelligence',
+        title: 'The Next Generation of Generative AI: What to Expect in 2027',
+        img: 'hero.png',
+        author: 'Sarah Jenkins',
+        date: 'Oct 24, 2026',
+        readTime: '8 min read',
+        body: `
+          <p>As AI models become increasingly sophisticated, researchers are pushing the boundaries of multimodal understanding and reasoning capabilities. We are no longer just looking at text-in, text-out. The models of tomorrow will seamlessly integrate vision, audio, and complex logical reasoning to act as true digital agents.</p>
+          <p>In the past year alone, we've seen breakthroughs in context window sizes and retrieval-augmented generation. But industry experts predict that by 2027, the focus will shift entirely towards <strong>agentic workflows</strong>—where AI systems don't just answer questions, but autonomously plan and execute multi-step tasks across various software applications.</p>
+          <h2>The Shift to Autonomy</h2>
+          <p>One of the largest hurdles for current generation large language models (LLMs) is reliability over long horizons. When tasked with a goal that requires 50 sequential steps, the compound error rate almost guarantees failure. However, new architectures are solving this.</p>
+          <blockquote>"By 2027, we won't be prompting models. We will be delegating objectives to them. The interface will move from a chatbox to a dashboard of active digital workers."</blockquote>
+          <p>This shift requires fundamentally new approaches to alignment and safety. How do you ensure an autonomous agent doesn't take catastrophic actions when given access to a production database or financial systems?</p>
+          <h2>Hardware Implications</h2>
+          <p>None of this software evolution happens without the silicon to power it. The demand for advanced NPUs (Neural Processing Units) is expected to triple over the next two years. Consumer hardware is also adapting, with on-device inference becoming the standard for privacy-sensitive tasks.</p>
+          <p>As we look forward to the next generation of AI, one thing is certain: the gap between human instruction and machine execution is closing rapidly.</p>
+        `
+      },
+      'ai-2': {
+        cat: 'Artificial Intelligence',
+        title: 'Are We Ready for AGI?',
+        img: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1200&q=80',
+        author: 'Dr. Alan Turing',
+        date: 'Oct 15, 2026',
+        readTime: '12 min read',
+        body: `
+          <p>Artificial General Intelligence (AGI) has been the holy grail of computer science for decades. But as specialized models begin to outpace human capabilities in specific domains, the question remains: Are we actually prepared for a generalized system?</p>
+          <p>Unlike current narrow AI, AGI would possess the ability to understand, learn, and apply knowledge across an infinite range of tasks, much like a human being.</p>
+          <h2>The Control Problem</h2>
+          <p>The primary concern among researchers is the alignment problem. If an AGI system surpasses human intelligence, how do we guarantee that its goals remain aligned with human prosperity?</p>
+          <blockquote>"We are summoning the demon. In all those stories where there's the guy with the pentagram and the holy water, it's like yeah he's sure he can control the demon. Didn't work out." - Elon Musk (historical quote)</blockquote>
+          <p>We need robust frameworks for AI safety before we cross the threshold into AGI. The next five years will be critical in establishing these boundaries.</p>
+        `
+      },
+      'gadgets-1': {
+        cat: 'Gadgets',
+        title: 'Apple\'s AR Glasses: A Developer\'s First Look',
+        img: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1200&q=80',
+        author: 'Tim Cook',
+        date: 'Oct 22, 2026',
+        readTime: '6 min read',
+        body: `
+          <p>After years of speculation, the much-anticipated AR glasses are finally in the hands of developers. We spent a week testing the SDK and building native spatial applications.</p>
+          <h2>The Hardware</h2>
+          <p>The design is remarkably lightweight, looking more like traditional Ray-Bans than a bulky VR headset. The micro-OLED displays offer stunning clarity, and the eye-tracking is virtually flawless.</p>
+          <h2>Spatial Computing Evolution</h2>
+          <p>Developing for this platform requires a complete paradigm shift. You are no longer constraining UI to a rectangle. The entire environment is your canvas.</p>
+          <p>We are incredibly excited to see what the developer community builds. The future is spatial.</p>
+        `
+      },
+      'gadgets-2': {
+        cat: 'Hardware',
+        title: 'Review: The Quantum Computing Desktop is Finally Here',
+        img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80',
+        author: 'David Chen',
+        date: 'Oct 22, 2026',
+        readTime: '10 min read',
+        body: `
+          <p>Quantum computing has traditionally been confined to massive, super-cooled laboratories. Today, we are reviewing the first commercially available 'desktop' quantum accelerator.</p>
+          <p>While it won't replace your standard CPU for daily tasks, the coprocessor excels at specific algorithmic workloads like cryptography, material science simulations, and complex optimization problems.</p>
+          <h2>Performance Metrics</h2>
+          <p>In our benchmark tests running Shor's algorithm, the accelerator outperformed our highest-end workstation by a factor of 10,000.</p>
+          <blockquote>"This isn't an iterative upgrade. This is a fundamental leap in computing architecture."</blockquote>
+          <p>At $15,000, it's strictly for enterprise and research, but it signals a new era in accessible quantum hardware.</p>
+        `
+      },
+      'software-1': {
+        cat: 'Software',
+        title: 'The State of Rust in Linux Kernel Development',
+        img: 'https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=1200&q=80',
+        author: 'Linus T.',
+        date: 'Oct 18, 2026',
+        readTime: '7 min read',
+        body: `
+          <p>The integration of Rust into the Linux kernel has been one of the most significant shifts in systems programming history. Today, we look at the progress made and the challenges remaining.</p>
+          <p>Memory safety continues to be the primary driver. By rewriting critical drivers in Rust, the kernel community has eliminated entire classes of memory corruption bugs.</p>
+          <h2>Driver Ecosystem</h2>
+          <p>We are seeing widespread adoption in the network and GPU driver space. The strict compiler checks mean that if a Rust driver compiles, it's highly likely to be stable in production.</p>
+          <p>C will remain the dominant language for the foreseeable future, but Rust has proven it has a permanent home in the kernel.</p>
+        `
+      },
+      'software-2': {
+        cat: 'Cybersecurity',
+        title: 'Why Zero-Trust Architecture is the New Standard',
+        img: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80',
+        author: 'Elena Rodriguez',
+        date: 'Oct 20, 2026',
+        readTime: '5 min read',
+        body: `
+          <p>The perimeter-based security model is dead. With remote work and cloud infrastructure, the concept of a "trusted internal network" no longer exists.</p>
+          <h2>Never Trust, Always Verify</h2>
+          <p>Zero-Trust Architecture (ZTA) operates on the principle that no entity—user, device, or application—should be trusted by default, regardless of its location relative to the corporate network.</p>
+          <p>Implementing ZTA requires strong identity management, multi-factor authentication, and continuous monitoring. It's challenging to retrofit, but absolutely essential for modern security posture.</p>
+        `
+      },
+       'software-3': {
+        cat: 'Software',
+        title: '5 Productivity Apps That Actually Use AI Well',
+        img: 'https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=1200&q=80',
+        author: 'Alex Mercer',
+        date: 'Oct 20, 2026',
+        readTime: '4 min read',
+        body: `
+          <p>Every app claims to be "AI-powered" nowadays, but most just slap a chatbot interface onto existing tools. We tested 50 apps and found the 5 that genuinely enhance productivity.</p>
+          <h2>The Winners</h2>
+          <p>From automated calendar scheduling that negotiates meeting times for you, to note-taking apps that automatically synthesize and cross-reference your ideas. AI should fade into the background and reduce friction, not add a new interface to manage.</p>
+        `
+      },
+      'reviews-1': {
+        cat: 'Reviews',
+        title: 'Review: Logitech MX Master 4',
+        img: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=1200&q=80',
+        author: 'Tech Reviewer',
+        date: 'Oct 10, 2026',
+        readTime: '6 min read',
+        body: `
+          <p>The undisputed king of productivity mice has returned. The MX Master 4 refines an already near-perfect design.</p>
+          <h2>What's New</h2>
+          <p>The primary upgrades are a new 8K optical sensor and a remarkably silent magnetic scroll wheel. The ergonomics remain largely unchanged, which is a good thing.</p>
+          <p>If you own the MX Master 3, you don't need to upgrade. But if you're coming from anything else, this is the mouse to buy.</p>
+        `
+      },
+      'reviews-2': {
+        cat: 'Reviews',
+        title: 'MacBook Pro M4 Max Deep Dive',
+        img: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=80',
+        author: 'John Gruber',
+        date: 'Oct 05, 2026',
+        readTime: '15 min read',
+        body: `
+          <p>Apple silicon continues its relentless march forward. The M4 Max is, simply put, a marvel of engineering.</p>
+          <h2>Unprecedented Power Efficiency</h2>
+          <p>We rendered a complex 8K video timeline while on battery power, and the machine didn't even drop a frame. More impressively, the fans never turned on.</p>
+          <p>This laptop provides desktop-class workstation performance in a portable form factor, solidifying its place as the ultimate tool for creative professionals.</p>
+        `
+      }
+    };
+
+    // Initialize page content
+    document.addEventListener('DOMContentLoaded', () => {
+      checkSubscription();
+      loadArticle();
+    });
+
+    function loadArticle() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const articleId = urlParams.get('id') || 'ai-1'; // Default to ai-1 if no id
+      const article = articlesDb[articleId];
+
+      const container = document.getElementById('articleContainer');
+      
+      if (!article) {
+        container.innerHTML = '<h1>Article not found</h1><p>Sorry, the requested article does not exist.</p><a href="index.html" class="subscribe-btn">Return Home</a>';
+        return;
+      }
+
+      document.title = article.title + ' | TechVibe';
+
+      container.innerHTML = `
+        <a href="index.html" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); font-weight: 600; margin-bottom: 2rem; font-size: 0.95rem; transition: color 0.2s;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to Articles
+        </a>
+        <header class="article-header">
+          <span class="category-tag">${article.cat}</span>
+          <h1>${article.title}</h1>
+          <div class="article-meta">
+            <div class="author-avatar"></div>
+            <div class="author-info">
+              <strong>${article.author}</strong>
+              Senior Correspondent • ${article.date} • ${article.readTime}
+            </div>
+          </div>
+        </header>
+
+        <div class="article-hero-img" style="background-image: url('${article.img}')"></div>
+
+        <div class="article-body">
+          ${article.body}
+        </div>
+      `;
+    }
+
+    function checkSubscription() {
+      const isSubscribed = localStorage.getItem('techvibe_subscribed');
+      const widget = document.getElementById('sidebarNewsletter');
+      const navBtn = document.querySelector('.subscribe-btn');
+      
+      if (isSubscribed) {
+        if(widget) {
+          widget.innerHTML = '<h3>Thank You!</h3><p>You are subscribed to TechVibe Weekly.</p>';
+          widget.style.background = 'var(--primary-dark)';
+        }
+        if(navBtn) {
+          navBtn.style.display = 'none';
+        }
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastMsg');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function openModal() {
+      document.getElementById('subscribeModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('subscribeModal').style.display = 'none';
+    }
+
+    function handleSubscribe(inputId) {
+      const emailInput = document.getElementById(inputId);
+      if(!emailInput) return;
+      const email = emailInput.value.trim();
+      
+      if (!email || !email.includes('@')) {
+        showToast('Please enter a valid email address.');
+        return;
+      }
+      
+      localStorage.setItem('techvibe_subscribed', 'true');
+      closeModal();
+      showToast('Successfully subscribed to TechVibe Weekly!');
+      checkSubscription();
+    }
+  </script>
+</body>
+</html>

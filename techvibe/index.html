@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechVibe | Technology Magazine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #047857;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --text: #111827;
+      --text-muted: #4b5563;
+      --border: #e5e7eb;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    
+    .logo span {
+      color: var(--primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--primary);
+    }
+
+    .subscribe-btn {
+      background-color: var(--text);
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background-color 0.2s;
+    }
+
+    .subscribe-btn:hover {
+      background-color: var(--primary);
+    }
+
+    /* Main Content */
+    main {
+      max-width: 1200px;
+      margin: 2.5rem auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 3rem;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Featured Article */
+    .featured-article {
+      margin-bottom: 3rem;
+      background: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s;
+    }
+    
+    .featured-article:hover {
+      transform: translateY(-4px);
+    }
+
+    .featured-image {
+      width: 100%;
+      height: 400px;
+      background-color: #f3f4f6;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .article-content {
+      padding: 2rem;
+    }
+
+    .category-tag {
+      color: var(--primary);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+      display: inline-block;
+    }
+
+    .featured-article h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.25rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .article-excerpt {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .author-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #d1d5db;
+      background-image: url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80');
+      background-size: cover;
+    }
+
+    /* Post Grid */
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .post-card {
+      background: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .post-card-img {
+      height: 200px;
+      background-color: #f3f4f6;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .post-card-content {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .post-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      margin: 0.5rem 0 1rem 0;
+      line-height: 1.3;
+    }
+
+    .post-card .article-meta {
+      margin-top: auto;
+    }
+
+    /* Sidebar */
+    aside {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+
+    .widget {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .widget h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .popular-post {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .popular-post:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .popular-num {
+      color: var(--primary);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .popular-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    
+    .popular-title:hover {
+      color: var(--primary);
+    }
+
+    /* Newsletter */
+    .newsletter-widget {
+      background: var(--text);
+      color: white;
+      text-align: center;
+    }
+    
+    .newsletter-widget h3 {
+      border-bottom-color: rgba(255,255,255,0.2);
+    }
+
+    .newsletter-widget p {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      color: #9ca3af;
+    }
+
+    .newsletter-widget input {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #4b5563;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      margin-bottom: 0.75rem;
+    }
+
+    .newsletter-widget button {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .newsletter-widget button:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Modal & Toast */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--surface);
+      padding: 2.5rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+      text-align: center;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);
+    }
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--text);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      font-weight: 600;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Floating Back Button */
+    .back-to-portfolio {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      background: var(--surface);
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 1000;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border);
+    }
+
+    .back-to-portfolio:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <div class="logo">Tech<span>Vibe</span></div>
+      <nav class="nav-links">
+        <a href="#ai" class="active">AI & Future</a>
+        <a href="#gadgets">Gadgets</a>
+        <a href="#software">Software</a>
+        <a href="#reviews">Reviews</a>
+      </nav>
+      <a href="#" class="subscribe-btn">Subscribe</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="content-area">
+      
+      <article class="featured-article">
+        <a href="article.html?id=ai-1">
+          <div class="featured-image" style="background-image: url('hero.png');"></div>
+          <div class="article-content">
+            <span class="category-tag">Artificial Intelligence</span>
+            <h2>The Next Generation of Generative AI: What to Expect in 2027</h2>
+            <p class="article-excerpt">As AI models become increasingly sophisticated, researchers are pushing the boundaries of multimodal understanding and reasoning capabilities.</p>
+            <div class="article-meta">
+              <div class="author-avatar"></div>
+              <span>Sarah Jenkins</span>
+              <span>•</span>
+              <span>Oct 24, 2026</span>
+            </div>
+          </div>
+        </a>
+      </article>
+
+      <h2 style="font-family: 'Playfair Display', serif; margin: 3rem 0 1.5rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;" id="ai">AI & Future</h2>
+      <div class="post-grid">
+        <article class="post-card">
+          <a href="article.html?id=ai-1">
+            <div class="post-card-img" style="background-image: url('hero.png')"></div>
+            <div class="post-card-content">
+              <span class="category-tag">AI</span>
+              <h3>The Next Generation of Generative AI</h3>
+              <div class="article-meta" style="margin-top: 1rem;">
+                <span>Sarah Jenkins</span>
+                <span>•</span>
+                <span>Oct 24</span>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        <article class="post-card">
+          <a href="article.html?id=ai-2">
+            <div class="post-card-img" style="background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=600&q=80')"></div>
+            <div class="post-card-content">
+              <span class="category-tag">AI</span>
+              <h3>Are We Ready for AGI?</h3>
+              <div class="article-meta" style="margin-top: 1rem;">
+                <span>Dr. Alan Turing</span>
+                <span>•</span>
+                <span>Oct 15</span>
+              </div>
+            </div>
+          </a>
+        </article>
+      </div>
+
+      <h2 style="font-family: 'Playfair Display', serif; margin: 3rem 0 1.5rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;" id="gadgets">Gadgets</h2>
+      <div class="post-grid">
+        <article class="post-card">
+          <a href="article.html?id=gadgets-1">
+            <div class="post-card-img" style="background-image: url('https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=600&q=80')"></div>
+            <div class="post-card-content">
+              <span class="category-tag">Gadgets</span>
+              <h3>Apple's AR Glasses: A Developer's First Look</h3>
+              <div class="article-meta" style="margin-top: 1rem;">
+                <span>Tim Cook</span>
+                <span>•</span>
+                <span>Oct 22</span>
+              </div>
+            </div>
+          </a>
+        </article>
+        
+        <article class="post-card">
+          <a href="article.html?id=gadgets-2">
+            <div class="post-card-img" style="background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80')"></div>
+            <div class="post-card-content">
+              <span class="category-tag">Hardware</span>
+              <h3>Review: The Quantum Computing Desktop is Finally Here</h3>
+              <div class="article-meta" style="margin-top: 1rem;">
+                <span>David Chen</span>
+                <span>•</span>
+                <span>Oct 22</span>
+              </div>
+            </div>
+          </a>
+        </article>
+      </div>
+
+      <h2 style="font-family: 'Playfair Display', serif; margin: 3rem 0 1.5rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;" id="software">Software</h2>
+      <div class="post-grid">
+        <article class="post-card">
+          <a href="article.html?id=software-1">
+            <div class="post-card-img" style="background-image: url('https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=600&q=80')"></div>
+            <div class="post-card-content">
+              <span class="category-tag">Software</span>
+              <h3>The State of Rust in Linux Kernel Development</h3>
+              <div class="article-meta" style="margin-top: 1rem;">
+                <span>Linus T.</span>
+                <span>•</span>
+                <span>Oct 18</span>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        <article class="post-card">
+          <a href="article.html?id=software-2">
+            <div class="post-card-img" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80')"></div>
+            <div class="post-card-content">
+              <span class="category-tag">Cybersecurity</span>
+              <h3>Why Zero-Trust Architecture is the New Standard</h3>
+              <div class="article-meta" style="margin-top: 1rem;">
+                <span>Elena Rodriguez</span>
+                <span>•</span>
+                <span>Oct 20</span>
+              </div>
+            </div>
+          </a>
+        </article>
+      </div>
+
+      <h2 style="font-family: 'Playfair Display', serif; margin: 3rem 0 1.5rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;" id="reviews">Reviews</h2>
+      <div class="post-grid">
+        <article class="post-card">
+          <a href="article.html?id=reviews-1">
+            <div class="post-card-img" style="background-image: url('https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=600&q=80')"></div>
+            <div class="post-card-content">
+              <span class="category-tag">Reviews</span>
+              <h3>Review: Logitech MX Master 4</h3>
+              <div class="article-meta" style="margin-top: 1rem;">
+                <span>Tech Reviewer</span>
+                <span>•</span>
+                <span>Oct 10</span>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        <article class="post-card">
+          <a href="article.html?id=reviews-2">
+            <div class="post-card-img" style="background-image: url('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80')"></div>
+            <div class="post-card-content">
+              <span class="category-tag">Reviews</span>
+              <h3>MacBook Pro M4 Max Deep Dive</h3>
+              <div class="article-meta" style="margin-top: 1rem;">
+                <span>John Gruber</span>
+                <span>•</span>
+                <span>Oct 05</span>
+              </div>
+            </div>
+          </a>
+        </article>
+      </div>
+
+    </div>
+
+    <aside>
+      <div class="widget">
+        <h3>Trending Now</h3>
+        
+        <div class="popular-post">
+          <div class="popular-num">01</div>
+          <div>
+            <a href="article.html?id=gadgets-1" class="popular-title">Apple's AR Glasses: A Developer's First Look</a>
+          </div>
+        </div>
+
+        <div class="popular-post">
+          <div class="popular-num">02</div>
+          <div>
+            <a href="article.html?id=software-1" class="popular-title">The State of Rust in Linux Kernel Development</a>
+          </div>
+        </div>
+
+        <div class="popular-post">
+          <div class="popular-num">03</div>
+          <div>
+            <a href="article.html?id=software-3" class="popular-title">5 Productivity Apps That Actually Use AI Well</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget newsletter-widget" id="sidebarNewsletter">
+        <h3>TechVibe Weekly</h3>
+        <p>Get the latest tech news and deep dives delivered straight to your inbox.</p>
+        <input type="email" id="sidebarEmail" placeholder="Your email address">
+        <button onclick="handleSubscribe('sidebarEmail')">Subscribe</button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toastMsg">Action successful!</div>
+
+  <!-- Subscribe Modal -->
+  <div class="modal-overlay" id="subscribeModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1rem;">Join TechVibe</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Get exclusive insights delivered to your inbox.</p>
+      <input type="email" id="modalEmail" placeholder="Email Address" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 6px;">
+      <button onclick="handleSubscribe('modalEmail')" style="width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Subscribe Now</button>
+    </div>
+  </div>
+
+  <a href="/" class="back-to-portfolio">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back to Portfolio
+  </a>
+
+  <script>
+    // Show toast for links
+    document.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if(link.classList.contains('subscribe-btn')) {
+          e.preventDefault();
+          openModal();
+        }
+      });
+    });
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastMsg');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Initialize subscription state
+    document.addEventListener('DOMContentLoaded', () => {
+      checkSubscription();
+    });
+
+    function checkSubscription() {
+      const isSubscribed = localStorage.getItem('techvibe_subscribed');
+      const widget = document.getElementById('sidebarNewsletter');
+      const navBtn = document.querySelector('.subscribe-btn');
+      
+      if (isSubscribed) {
+        if(widget) {
+          widget.innerHTML = '<h3>Thank You!</h3><p>You are subscribed to TechVibe Weekly.</p>';
+          widget.style.background = 'var(--primary-dark)';
+        }
+        if(navBtn) {
+          navBtn.style.display = 'none';
+        }
+      }
+    }
+
+    function openModal() {
+      document.getElementById('subscribeModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('subscribeModal').style.display = 'none';
+    }
+
+    function handleSubscribe(inputId) {
+      const emailInput = document.getElementById(inputId);
+      const email = emailInput.value.trim();
+      
+      if (!email || !email.includes('@')) {
+        showToast('Please enter a valid email address.');
+        return;
+      }
+      
+      localStorage.setItem('techvibe_subscribed', 'true');
+      closeModal();
+      showToast('Successfully subscribed to TechVibe Weekly!');
+      checkSubscription();
+    }
+  </script>
+</body>
+</html>

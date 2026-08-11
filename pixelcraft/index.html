@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PixelCraft | Creative Digital Agency & WordPress Architecture</title>
+  <meta name="description" content="Award-winning digital agency crafting high-converting web experiences, custom WordPress Gutenberg architectures, and brand systems." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-surface: #0f172a;
+      --bg-card: #131d31;
+      --bg-card-hover: #1c2840;
+      --primary-grad: linear-gradient(135deg, #ec4899, #8b5cf6);
+      --primary-solid: #ec4899;
+      --violet-solid: #8b5cf6;
+      --cyan-bright: #38bdf8;
+      --border-dark: #1e293b;
+      --border-glow: rgba(236, 72, 153, 0.4);
+      --text-main: #ffffff;
+      --text-sub: #cbd5e1;
+      --text-muted: #94a3b8;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-pill: 9999px;
+      --shadow-glow: 0 10px 40px -10px rgba(236, 72, 153, 0.5);
+      --font-heading: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      background-image: 
+        radial-gradient(circle at 85% 15%, rgba(236, 72, 153, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 15% 45%, rgba(139, 92, 246, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(15, 23, 42, 0.6) 0%, transparent 60%);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font-family: inherit; }
+
+    .container { width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
+
+    /* Nav */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .nav-inner {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--primary-grad);
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+    }
+
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      transition: all .2s ease;
+    }
+    .nav-links a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-nav-cta {
+      background: var(--primary-grad);
+      color: #ffffff;
+      font-weight: 850;
+      font-size: 0.9rem;
+      padding: 10px 22px;
+      border-radius: var(--radius-pill);
+      border: 0;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+      transition: all .25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-nav-cta:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: var(--shadow-glow);
+    }
+
+    /* Hero Section (2 Columns matching SVG preview) */
+    .hero {
+      padding: 70px 0 60px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(236, 72, 153, 0.15);
+      border: 1px solid rgba(236, 72, 153, 0.4);
+      color: #f472b6;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #f472b6, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: block;
+    }
+
+    .hero-desc {
+      font-size: 1.12rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+
+    .hero-actions-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .btn-hero-primary {
+      background: var(--primary-grad);
+      color: #ffffff;
+      font-weight: 850;
+      font-size: 1rem;
+      padding: 14px 30px;
+      border-radius: var(--radius-pill);
+      border: 0;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4);
+      transition: all .25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(236, 72, 153, 0.6);
+    }
+    .btn-hero-outline {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-dark);
+      color: var(--text-sub);
+      font-weight: 750;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .btn-hero-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: #f472b6;
+    }
+
+    /* Metrics Strip */
+    .metrics-strip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dark);
+      border-radius: 16px;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .metric-item { text-align: center; }
+    .metric-val {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #ffffff;
+      display: block;
+    }
+    .metric-val.cyan { color: var(--cyan-bright); }
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .metric-divider { width: 1px; height: 36px; background: var(--border-dark); }
+
+    /* Right Visual Showcase (Matches SVG 2 Mini Cards) */
+    .hero-showcase-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+    .service-card:hover {
+      background: var(--bg-card);
+      border-color: var(--primary-solid);
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-glow);
+    }
+    .showcase-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 32px;
+      transition: all .25s ease;
+    }
+    .showcase-card:last-child {
+      margin-bottom: 0;
+    }
+    .showcase-card:hover {
+      transform: translateY(-3px);
+      border-color: #f472b6;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    .showcase-thumb {
+      width: 58px;
+      height: 58px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .thumb-pink { background: var(--primary-grad); }
+    .thumb-cyan { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+    .showcase-info h4 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+    .showcase-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .badge-gutenberg {
+      display: inline-block;
+      background: rgba(236, 72, 153, 0.2);
+      color: #f472b6;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 0.72rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    /* Selected Work Section */
+    section { padding: 80px 0; }
+    .section-head {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 48px;
+    }
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 850;
+      color: #ffffff;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    /* Projects Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+    }
+    .project-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all .3s ease;
+    }
+    .project-card:hover {
+      transform: translateY(-5px);
+      border-color: #f472b6;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    }
+    .project-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+    .project-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    /* Project Estimator Section */
+    .estimator-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dark);
+      border-radius: 28px;
+      padding: 44px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .estimator-slider-row { margin-bottom: 24px; }
+    .estimator-slider-row label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 750;
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      margin-bottom: 10px;
+    }
+    .range-slider {
+      width: 100%;
+      accent-color: var(--primary-solid);
+      cursor: pointer;
+    }
+
+    .estimate-display-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .estimate-price-val {
+      font-family: var(--font-heading);
+      font-size: 3.2rem;
+      font-weight: 900;
+      color: var(--cyan-bright);
+      margin: 12px 0 6px;
+    }
+
+    /* Floating Back Pill */
+    .back-btn-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 150;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid #ec4899;
+      color: #ffffff;
+      padding: 12px 22px;
+      border-radius: var(--radius-pill);
+      font-weight: 800;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      transition: all .2s ease;
+    }
+    .back-btn-pill:hover {
+      background: #ec4899;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid, .estimator-container { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .projects-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .metrics-strip { flex-direction: column; }
+      .metric-divider { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">PixelCraft</div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#services">Services</a>
+        <a href="#work">Case Studies</a>
+        <a href="#estimator">Estimator</a>
+      </nav>
+
+      <a href="#estimator" class="btn-nav-cta">
+        <span>Get Started</span>
+        <span>↗</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        
+        <!-- Left Hero Copy -->
+        <div>
+          <div class="hero-badge">★ CREATIVE AGENCY</div>
+
+          <h1 class="hero-title">
+            Crafting High-Converting
+            <span class="gradient-text">Digital Experiences</span>
+          </h1>
+
+          <p class="hero-desc">
+            Award-winning UI/UX design and custom WordPress engineering. Specializing in high-performance Gutenberg block themes, headless frontends, and bespoke brand systems.
+          </p>
+
+          <div class="hero-actions-row">
+            <a href="#work" class="btn-hero-primary">
+              <span>Explore Work</span>
+              <span>↗</span>
+            </a>
+            <a href="#estimator" class="btn-hero-outline">Book a Call</a>
+          </div>
+
+          <!-- 3-Metric Strip (Matches SVG) -->
+          <div class="metrics-strip">
+            <div class="metric-item">
+              <span class="metric-val">98%</span>
+              <span class="metric-label">Satisfaction</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <span class="metric-val">120+</span>
+              <span class="metric-label">Projects Done</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <span class="metric-val cyan">100</span>
+              <span class="metric-label">Performance</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Showcase Cards (Matches SVG) -->
+        <div class="hero-showcase-box">
+          <div class="showcase-card">
+            <div class="showcase-thumb thumb-pink">💳</div>
+            <div class="showcase-info">
+              <h4>FinTech Platform</h4>
+              <p>Web App &amp; Design System</p>
+              <span class="badge-gutenberg">Gutenberg</span>
+            </div>
+          </div>
+
+          <div class="showcase-card">
+            <div class="showcase-thumb thumb-cyan">📊</div>
+            <div class="showcase-info">
+              <h4>SaaS Analytics UI</h4>
+              <p>Dashboard Architecture</p>
+              <span class="badge-gutenberg">Full Site Editing</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Selected Work Section -->
+    <section id="work">
+      <div class="container">
+        <div class="section-head">
+          <div class="hero-badge">Portfolio</div>
+          <h2 class="section-title">Selected Agency Case Studies</h2>
+          <p class="section-desc">Custom block themes, enterprise WooCommerce, and high-speed web apps.</p>
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;">
+          <button class="tab-filter-btn" style="padding:10px 22px;border-radius:999px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;border:1px solid #ec4899;color:#ec4899;background:rgba(236,72,153,0.12);transition:all .2s;" onclick="filterPortfolio('all',this)" data-active="true">All Work</button>
+          <button class="tab-filter-btn" style="padding:10px 22px;border-radius:999px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.12);color:#94a3b8;background:transparent;transition:all .2s;" onclick="filterPortfolio('wordpress',this)">WordPress / Gutenberg</button>
+          <button class="tab-filter-btn" style="padding:10px 22px;border-radius:999px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.12);color:#94a3b8;background:transparent;transition:all .2s;" onclick="filterPortfolio('woocommerce',this)">WooCommerce</button>
+          <button class="tab-filter-btn" style="padding:10px 22px;border-radius:999px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.12);color:#94a3b8;background:transparent;transition:all .2s;" onclick="filterPortfolio('saas',this)">SaaS / Web App</button>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid">
+          <article class="project-card" data-category="wordpress" onclick="openProjectModal('Apex Wealth Portal', 'Modern asset management flagship concept with custom block patterns, fluid CSS typography, and optimized responsive layouts.')" style="cursor:pointer;">
+            <div>
+              <span class="badge-gutenberg" style="margin-bottom: 12px;">WordPress Block Theme</span>
+              <h3>Apex Wealth Portal</h3>
+              <p>Modern asset management flagship concept with custom block patterns, fluid CSS typography, and optimized responsive layouts.</p>
+            </div>
+            <a style="color: #f472b6; font-weight: 800; font-size: 0.88rem;">View Architecture ↗</a>
+          </article>
+
+          <article class="project-card" data-category="woocommerce" onclick="openProjectModal('Kroma Artisan Goods', 'Responsive WooCommerce storefront concept with smooth page transitions, slide-out cart drawer, and clean product grids.')" style="cursor:pointer;">
+            <div>
+              <span class="badge-gutenberg" style="margin-bottom: 12px;">WooCommerce Storefront</span>
+              <h3>Kroma Artisan Goods</h3>
+              <p>Responsive WooCommerce storefront concept with smooth page transitions, slide-out cart drawer, and clean product grids.</p>
+            </div>
+            <a style="color: #f472b6; font-weight: 800; font-size: 0.88rem;">View Architecture ↗</a>
+          </article>
+
+          <article class="project-card" data-category="saas" onclick="openProjectModal('Vortex Cloud Platform', 'Interactive product marketing experience featuring dark glassmorphism, fluid interactive sliders, and accessibility-focused design.')" style="cursor:pointer;">
+            <div>
+              <span class="badge-gutenberg" style="margin-bottom: 12px;">SaaS Product Landing</span>
+              <h3>Vortex Cloud Platform</h3>
+              <p>Interactive product marketing experience featuring dark glassmorphism, fluid interactive sliders, and accessibility-focused design.</p>
+            </div>
+            <a style="color: #f472b6; font-weight: 800; font-size: 0.88rem;">View Architecture ↗</a>
+          </article>
+
+          <article class="project-card" data-category="wordpress" onclick="openProjectModal('Aether Editorial Blog', 'Long-form editorial WordPress theme with advanced typography, custom Post Grid block, and dark/light mode switching.')" style="cursor:pointer;">
+            <div>
+              <span class="badge-gutenberg" style="margin-bottom: 12px;">Full Site Editing Theme</span>
+              <h3>Aether Editorial Blog</h3>
+              <p>Long-form editorial WordPress theme with advanced typography, custom Post Grid block, and dark/light mode switching.</p>
+            </div>
+            <a style="color: #f472b6; font-weight: 800; font-size: 0.88rem;">View Architecture ↗</a>
+          </article>
+
+          <article class="project-card" data-category="saas" onclick="openProjectModal('DataPulse Analytics UI', 'Dashboard-first SaaS interface with real-time chart visualizations, dark-mode first design system, and accessible data tables.')" style="cursor:pointer;">
+            <div>
+              <span class="badge-gutenberg" style="margin-bottom: 12px;">SaaS Analytics Dashboard</span>
+              <h3>DataPulse Analytics UI</h3>
+              <p>Dashboard-first SaaS interface with real-time chart visualizations, dark-mode first design system, and accessible data tables.</p>
+            </div>
+            <a style="color: #f472b6; font-weight: 800; font-size: 0.88rem;">View Architecture ↗</a>
+          </article>
+
+          <article class="project-card" data-category="woocommerce" onclick="openProjectModal('Luminos Wellness Shop', 'Wellness brand e-commerce site built on WooCommerce with custom product tabs, subscription integration, and Elementor block system.')" style="cursor:pointer;">
+            <div>
+              <span class="badge-gutenberg" style="margin-bottom: 12px;">WooCommerce + Elementor</span>
+              <h3>Luminos Wellness Shop</h3>
+              <p>Wellness brand e-commerce site built on WooCommerce with custom product tabs, subscription integration, and Elementor block system.</p>
+            </div>
+            <a style="color: #f472b6; font-weight: 800; font-size: 0.88rem;">View Architecture ↗</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Interactive Price Estimator -->
+    <section id="estimator">
+      <div class="container">
+        <div class="estimator-container">
+          <div>
+            <div class="hero-badge">Instant Calculator</div>
+            <h2 class="section-title" style="margin-bottom: 16px;">Interactive Project Estimator</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px;">
+              Calculate scope and investment for custom WordPress themes, UI/UX design sprints, and responsive web applications.
+            </p>
+
+            <div class="estimator-slider-row">
+              <label>
+                <span>Estimated Page Templates</span>
+                <span id="pageCountLabel" style="color: #f472b6; font-weight: 900;">5 Pages</span>
+              </label>
+              <input type="range" min="1" max="20" value="5" class="range-slider" id="pageSlider" oninput="updateEstimate()" />
+            </div>
+
+            <div class="estimator-slider-row">
+              <label>
+                <span>Custom Gutenberg Block Types</span>
+                <span id="blockCountLabel" style="color: var(--cyan-bright); font-weight: 900;">4 Blocks</span>
+              </label>
+              <input type="range" min="0" max="15" value="4" class="range-slider" id="blockSlider" oninput="updateEstimate()" />
+            </div>
+          </div>
+
+          <div class="estimate-display-box">
+            <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 750; text-transform: uppercase;">Estimated Project Investment</span>
+            <div class="estimate-price-val" id="estimatePriceDisplay">$2,450</div>
+            <span style="font-size: 0.85rem; color: #34d399; font-weight: 750; margin-bottom: 20px;">⚡ Estimated Turnaround: 2-3 Weeks</span>
+            <button class="btn-hero-primary" style="width: 100%; justify-content: center;" onclick="openContactModal()">
+              Request Project Proposal ↗
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+
+  <!-- Modals -->
+  <style>
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+    }
+    .modal-content {
+      background: #0f172a; border: 1px solid rgba(244, 114, 182, 0.4); border-radius: 24px; padding: 36px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: 0; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+    }
+    .form-input {
+      width: 100%; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-dark); color: #fff; margin-bottom: 8px; font-family: inherit;
+    }
+    .form-error {
+      color: #f87171; font-size: 0.8rem; margin-bottom: 12px; display: none;
+    }
+  </style>
+
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal-content" style="text-align:center;">
+      <button class="modal-close" onclick="closeModals()">✕</button>
+      <div style="font-size:3rem;margin-bottom:16px;">🚀</div>
+      <h3 id="pmTitle" style="color:#fff;font-size:1.8rem;margin-bottom:16px;">Project Title</h3>
+      <p id="pmDesc" style="color:var(--text-muted);margin-bottom:24px;">Project Description</p>
+      <button class="btn-hero-primary" onclick="closeModals()">Cool!</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="contactModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModals()">✕</button>
+      <h3 style="color:#fff;font-size:1.8rem;margin-bottom:8px;">Request Proposal</h3>
+      <p style="color:var(--text-muted);margin-bottom:24px;">Tell us about your project.</p>
+      
+      <label style="color:#cbd5e1;font-size:0.85rem;font-weight:700;">Name</label>
+      <input type="text" id="cmName" class="form-input" placeholder="Your Name">
+      <div class="form-error" id="errName">Please enter your name.</div>
+      
+      <label style="color:#cbd5e1;font-size:0.85rem;font-weight:700;">Email</label>
+      <input type="email" id="cmEmail" class="form-input" placeholder="you@company.com">
+      <div class="form-error" id="errEmail">Please enter a valid email.</div>
+
+      <button class="btn-hero-primary" style="width:100%;justify-content:center;margin-top:12px;" onclick="submitContact()">Send Inquiry</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-content" style="text-align:center;">
+      <button class="modal-close" onclick="closeModals()">✕</button>
+      <div style="font-size:3rem;margin-bottom:16px;">✅</div>
+      <h3 style="color:#34d399;font-size:1.8rem;margin-bottom:16px;">Inquiry Dispatched!</h3>
+      <p style="color:var(--text-muted);margin-bottom:24px;">We will contact you within 24 hours.</p>
+      <button class="btn-hero-primary" onclick="closeModals()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function filterPortfolio(category, btn) {
+      // Update button styles
+      document.querySelectorAll('.tab-filter-btn').forEach(b => {
+        b.style.background = 'transparent';
+        b.style.color = '#94a3b8';
+        b.style.borderColor = 'rgba(255,255,255,0.12)';
+      });
+      btn.style.background = 'rgba(236,72,153,0.12)';
+      btn.style.color = '#ec4899';
+      btn.style.borderColor = '#ec4899';
+
+      // Filter cards
+      document.querySelectorAll('#projectsGrid .project-card').forEach(card => {
+        const cat = card.dataset.category;
+        card.style.display = (category === 'all' || cat === category) ? '' : 'none';
+      });
+    }
+
+    function updateEstimate() {
+      const pages = parseInt(document.getElementById('pageSlider').value);
+      const blocks = parseInt(document.getElementById('blockSlider').value);
+
+      document.getElementById('pageCountLabel').textContent = `${pages} Pages`;
+      document.getElementById('blockCountLabel').textContent = `${blocks} Blocks`;
+
+      const base = 950;
+      const total = base + (pages * 200) + (blocks * 125);
+      document.getElementById('estimatePriceDisplay').textContent = `$${total.toLocaleString()}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateEstimate();
+    });
+
+    function openProjectModal(title, desc) {
+      document.getElementById('pmTitle').textContent = title;
+      document.getElementById('pmDesc').textContent = desc;
+      document.getElementById('projectModal').style.display = 'flex';
+    }
+
+    function openContactModal() {
+      document.getElementById('contactModal').style.display = 'flex';
+      document.getElementById('cmName').value = '';
+      document.getElementById('cmEmail').value = '';
+      document.getElementById('errName').style.display = 'none';
+      document.getElementById('errEmail').style.display = 'none';
+    }
+
+    function closeModals() {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+    }
+
+    function submitContact() {
+      const name = document.getElementById('cmName').value.trim();
+      const email = document.getElementById('cmEmail').value.trim();
+      let valid = true;
+
+      if (!name) { document.getElementById('errName').style.display = 'block'; valid = false; }
+      else { document.getElementById('errName').style.display = 'none'; }
+
+      if (!email || !email.includes('@')) { document.getElementById('errEmail').style.display = 'block'; valid = false; }
+      else { document.getElementById('errEmail').style.display = 'none'; }
+
+      if (valid) {
+        document.getElementById('contactModal').style.display = 'none';
+        document.getElementById('successModal').style.display = 'flex';
+      }
+    }
+  </script>
+</body>
+</html>

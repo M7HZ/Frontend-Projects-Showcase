@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DentalSync | Clinic Management System — UNITAR Project</title>
+  <meta name="description" content="Dental clinic management system with patient dashboard, appointment scheduling, patient records, and clinical data management. University project." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --cyan: #06b6d4;
+      --blue: #0ea5e9;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(255,255,255,0.1);
+      --glass: rgba(15,23,42,0.6);
+      --glass-hover: rgba(15,23,42,0.8);
+      --sidebar-w: 270px;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #f43f5e;
+      --font: 'Outfit', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0f172a;
+      color: var(--text-main);
+      font-family: var(--font);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        linear-gradient(to right, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.75) 100%),
+        url('https://images.unsplash.com/photo-1584982751601-97dcc096659c?q=80&w=1920&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .glass { background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      position: fixed;
+      height: 100vh;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      background: rgba(9,14,28,0.5);
+      backdrop-filter: blur(24px);
+      transition: transform 0.3s ease;
+    }
+    .sidebar.hidden { transform: translateX(-100%); }
+    .brand {
+      height: 76px;
+      display: flex; align-items: center;
+      padding: 0 28px;
+      font-size: 1.3rem; font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.03em;
+      gap: 12px;
+    }
+    .brand span { color: var(--cyan); }
+    .nav-menu { padding: 24px 16px; flex: 1; overflow-y: auto; }
+    .nav-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 18px; color: var(--text-muted);
+      border-radius: 12px; margin-bottom: 6px;
+      font-weight: 500; font-size: 0.95rem;
+      cursor: pointer; border: 1px solid transparent;
+      transition: all 0.25s; user-select: none;
+    }
+    .nav-item.active { background: rgba(6,182,212,0.12); color: var(--cyan); border-color: rgba(6,182,212,0.25); }
+    .nav-item:hover:not(.active) { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── MAIN ── */
+    .main-content { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      height: 76px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(9,14,28,0.6); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+    .hamburger {
+      display: none;
+      background: none; border: none; color: #fff; cursor: pointer;
+      font-size: 1.5rem; padding: 4px;
+    }
+    .search-wrap { position: relative; }
+    .search-wrap input {
+      width: 300px; padding: 11px 18px 11px 44px;
+      border: 1px solid var(--border); border-radius: 99px;
+      background: rgba(255,255,255,0.04); color: #fff; font-family: var(--font); font-size: 0.9rem;
+      outline: none; transition: all 0.25s;
+    }
+    .search-wrap input::placeholder { color: var(--text-muted); }
+    .search-wrap input:focus { background: rgba(255,255,255,0.08); border-color: var(--cyan); box-shadow: 0 0 16px rgba(6,182,212,0.15); }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem; }
+    .user-profile { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+    .user-info { text-align: right; }
+    .user-name { font-size: 0.9rem; font-weight: 600; }
+    .user-role { font-size: 0.75rem; color: var(--cyan); }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1rem; border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    /* ── PAGE VIEWS ── */
+    .page { display: none; padding: 32px; }
+    .page.active { display: block; }
+
+    /* ── PAGE HEADER ── */
+    .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .page-title { font-size: 1.9rem; font-weight: 700; background: linear-gradient(to right, #fff, var(--text-muted)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .page-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── STATS ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
+    .stat-card { border-radius: 18px; padding: 24px; transition: transform 0.25s; cursor: default; }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-icon { width: 44px; height: 44px; border-radius: 11px; background: rgba(6,182,212,0.1); color: var(--cyan); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 14px; }
+    .stat-label { color: var(--text-muted); font-size: 0.82rem; font-weight: 500; margin-bottom: 6px; }
+    .stat-value { font-size: 2.2rem; font-weight: 700; }
+
+    /* ── TABLE ── */
+    .section-card { border-radius: 20px; padding: 28px; margin-bottom: 24px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .section-title { font-size: 1.2rem; font-weight: 600; }
+    .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-tab {
+      padding: 7px 16px; border-radius: 99px; font-size: 0.8rem; font-weight: 600;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+    }
+    .filter-tab.active { background: rgba(6,182,212,0.15); color: var(--cyan); border-color: rgba(6,182,212,0.3); }
+    .filter-tab:hover:not(.active) { background: rgba(255,255,255,0.08); color: #fff; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px 16px; color: var(--text-muted); font-size: 0.78rem; font-weight: 600; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.06em; }
+    td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .patient-cell { display: flex; align-items: center; gap: 11px; }
+    .patient-avatar { width: 36px; height: 36px; border-radius: 9px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--cyan); font-size: 0.85rem; flex-shrink: 0; }
+    .p-name { font-weight: 600; color: #fff; }
+    .p-id { font-size: 0.75rem; color: var(--text-muted); }
+
+    .badge { display: inline-block; padding: 5px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; }
+    .badge-green { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+    .badge-amber { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+    .badge-red { background: rgba(244,63,94,0.15); color: #fb7185; border: 1px solid rgba(244,63,94,0.3); }
+    .badge-blue { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+
+    .row-action { padding: 6px 12px; background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25); color: var(--cyan); border-radius: 7px; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+    .row-action:hover { background: rgba(6,182,212,0.25); }
+
+    /* ── BUTTONS ── */
+    .btn { padding: 11px 22px; border-radius: 11px; font-weight: 600; font-family: var(--font); cursor: pointer; border: 1px solid var(--border); transition: all 0.25s; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #fff; border: none; box-shadow: 0 8px 18px rgba(6,182,212,0.2); }
+    .btn-primary:hover { box-shadow: 0 10px 24px rgba(6,182,212,0.4); transform: translateY(-2px); }
+    .btn-ghost { background: transparent; color: var(--text-muted); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.06); color: #fff; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+    .empty-state .e-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* ── PATIENT DETAIL PANEL ── */
+    .detail-panel {
+      position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
+      background: #0c1526; border-left: 1px solid var(--border);
+      z-index: 70; overflow-y: auto;
+      transition: right 0.3s ease;
+      box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+      padding: 28px;
+    }
+    .detail-panel.open { right: 0; }
+    .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .detail-title { font-size: 1.1rem; font-weight: 700; }
+    .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; padding: 4px; line-height: 1; }
+    .close-btn:hover { color: #fff; }
+    .detail-avatar-lg { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, var(--cyan), var(--blue)); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 16px; }
+    .detail-name { text-align: center; font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+    .detail-id { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.88rem; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-key { color: var(--text-muted); }
+    .detail-val { font-weight: 600; color: #fff; }
+
+    /* ── MODAL ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: #0c1526; border: 1px solid var(--border); border-radius: 20px; padding: 32px; width: 90%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+    .form-row { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-input, .form-select {
+      width: 100%; padding: 12px 16px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 10px; color: #fff; font-family: var(--font); font-size: 0.92rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--cyan); background: rgba(255,255,255,0.08); }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-select option { background: #0f172a; }
+    .form-row.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-error { font-size: 0.75rem; color: #f87171; margin-top: 5px; display: none; }
+    .modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+    /* ── CALENDAR VIEW ── */
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .cal-day-header { text-align: center; font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; padding: 8px 0; }
+    .cal-day { min-height: 70px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 8px; position: relative; }
+    .cal-day.today { border-color: var(--cyan); background: rgba(6,182,212,0.06); }
+    .cal-day.other-month { opacity: 0.3; }
+    .cal-date { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+    .cal-day.today .cal-date { color: var(--cyan); }
+    .cal-appt { background: rgba(6,182,212,0.15); border-radius: 4px; font-size: 0.68rem; padding: 2px 5px; margin-bottom: 2px; color: var(--cyan); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── SETTINGS ── */
+    .settings-grid { display: grid; gap: 20px; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .setting-label { font-weight: 600; font-size: 0.9rem; }
+    .setting-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+    .toggle { width: 44px; height: 24px; border-radius: 12px; background: rgba(255,255,255,0.1); border: none; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
+    .toggle.on { background: var(--cyan); }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: left 0.2s; }
+    .toggle.on::after { left: 23px; }
+
+    /* ── BACK PILL ── */
+    .back-btn-pill {
+      position: fixed; bottom: 24px; left: 24px; z-index: 150;
+      background: rgba(9,14,28,0.9); border: 1px solid var(--cyan); color: #fff;
+      padding: 11px 20px; border-radius: 99px; font-weight: 700; font-size: 0.85rem;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4); backdrop-filter: blur(10px);
+      text-decoration: none; transition: all .25s ease;
+    }
+    .back-btn-pill:hover { background: var(--cyan); color: #000; }
+
+    @media (max-width: 1024px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .hamburger { display: block; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .search-wrap input { width: 200px; }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .page { padding: 20px; }
+      .topbar { padding: 0 16px; }
+      .search-wrap input { width: 160px; }
+      .detail-panel { width: 100%; }
+      .form-row.two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+  <div class="brand">🦷 Dental<span>Sync</span></div>
+  <nav class="nav-menu">
+    <div class="nav-item active" onclick="navigate('overview')" role="button" aria-label="Overview">
+      <span class="nav-icon">📊</span> Overview
+    </div>
+    <div class="nav-item" onclick="navigate('calendar')" role="button" aria-label="Calendar">
+      <span class="nav-icon">📅</span> Calendar
+    </div>
+    <div class="nav-item" onclick="navigate('patients')" role="button" aria-label="Patients Database">
+      <span class="nav-icon">👥</span> Patients
+    </div>
+    <div class="nav-item" onclick="navigate('records')" role="button" aria-label="Clinical Records">
+      <span class="nav-icon">📝</span> Clinical Records
+    </div>
+    <div class="nav-item" onclick="navigate('financials')" role="button" aria-label="Financials">
+      <span class="nav-icon">💳</span> Financials
+    </div>
+    <div class="nav-item" onclick="navigate('settings')" role="button" aria-label="Settings">
+      <span class="nav-icon">⚙️</span> Settings
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    DentalSync v2.1 · UNITAR University Project<br>Demo data only — not a real clinic
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle navigation">☰</button>
+      <div class="search-wrap">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="text" id="globalSearch" placeholder="Search patients, records..." oninput="onSearch()" aria-label="Search patients and records" />
+      </div>
+    </div>
+    <div class="user-profile" aria-label="User profile">
+      <div class="user-info">
+        <div class="user-name">Dr. Alan Grant</div>
+        <div class="user-role">Lead Orthodontist</div>
+      </div>
+      <div class="avatar" aria-hidden="true">AG</div>
+    </div>
+  </header>
+
+  <!-- PAGE: OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Clinic Dashboard</h1>
+        <p class="page-subtitle">Today's operational overview — <span id="todayDate"></span></p>
+      </div>
+      <button class="btn btn-primary" onclick="openNewApptModal()">+ New Appointment</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card glass">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">Today's Patients</div>
+        <div class="stat-value" id="stat-today">12</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">New Appointments</div>
+        <div class="stat-value" id="stat-appts">4</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-icon">💳</div>
+        <div class="stat-label">Revenue Today</div>
+        <div class="stat-value">$1,840</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-icon" style="color:var(--danger);background:rgba(244,63,94,0.1)">⚠️</div>
+        <div class="stat-label">Cancellations</div>
+        <div class="stat-value" style="color:var(--danger)">1</div>
+      </div>
+    </div>
+
+    <div class="section-card glass">
+      <div class="section-header">
+        <div class="section-title">Upcoming Appointments</div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterAppts('all', this)">All</button>
+            <button class="filter-tab" onclick="filterAppts('upcoming', this)">Upcoming</button>
+            <button class="filter-tab" onclick="filterAppts('pending', this)">Pending</button>
+            <button class="filter-tab" onclick="filterAppts('cancelled', this)">Cancelled</button>
+          </div>
+          <button class="btn btn-primary" onclick="openNewApptModal()" style="padding:8px 16px;font-size:0.82rem;">+ Add</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="apptTable">
+          <thead>
+            <tr>
+              <th>Time</th><th>Patient</th><th>Treatment</th><th>Doctor</th><th>Status</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="apptBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: CALENDAR -->
+  <div class="page" id="page-calendar">
+    <div class="page-header">
+      <div><h1 class="page-title">Appointment Calendar</h1><p class="page-subtitle">Monthly view</p></div>
+      <button class="btn btn-primary" onclick="openNewApptModal()">+ New Appointment</button>
+    </div>
+    <div class="section-card glass">
+      <div id="calendarHeader" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <button class="btn btn-ghost" onclick="prevMonth()">← Prev</button>
+        <span id="calMonthLabel" style="font-size:1.1rem;font-weight:700;"></span>
+        <button class="btn btn-ghost" onclick="nextMonth()">Next →</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: PATIENTS -->
+  <div class="page" id="page-patients">
+    <div class="page-header">
+      <div><h1 class="page-title">Patient Database</h1><p class="page-subtitle" id="patientCount"></p></div>
+    </div>
+    <div class="section-card glass">
+      <div class="section-header">
+        <input type="text" class="form-input" style="max-width:280px;" placeholder="Search patients..." oninput="filterPatients(this.value)" aria-label="Search patients" />
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Patient</th><th>Age</th><th>Last Visit</th><th>Treatment</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="patientBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: RECORDS -->
+  <div class="page" id="page-records">
+    <div class="page-header"><div><h1 class="page-title">Clinical Records</h1><p class="page-subtitle">Treatment history and documentation</p></div></div>
+    <div class="section-card glass">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Record ID</th><th>Patient</th><th>Date</th><th>Treatment</th><th>Doctor</th><th>Notes</th></tr></thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: FINANCIALS -->
+  <div class="page" id="page-financials">
+    <div class="page-header"><div><h1 class="page-title">Financials</h1><p class="page-subtitle">Revenue and invoice tracking</p></div></div>
+    <div class="stats-grid">
+      <div class="stat-card glass"><div class="stat-icon">💰</div><div class="stat-label">Monthly Revenue</div><div class="stat-value">$24,580</div></div>
+      <div class="stat-card glass"><div class="stat-icon">📄</div><div class="stat-label">Invoices Issued</div><div class="stat-value">187</div></div>
+      <div class="stat-card glass"><div class="stat-icon">⏳</div><div class="stat-label">Pending Payments</div><div class="stat-value" style="color:var(--warning)">$3,240</div></div>
+      <div class="stat-card glass"><div class="stat-icon">✅</div><div class="stat-label">Settled This Month</div><div class="stat-value" style="color:var(--success)">$21,340</div></div>
+    </div>
+    <div class="section-card glass">
+      <div class="section-header"><div class="section-title">Recent Invoices</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Invoice</th><th>Patient</th><th>Treatment</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>#INV-4021</td><td>Sarah Jenkins</td><td>Root Canal Checkup</td><td>$320</td><td><span class="badge badge-green">Paid</span></td></tr>
+            <tr><td>#INV-4022</td><td>Marcus Chen</td><td>Teeth Whitening</td><td>$480</td><td><span class="badge badge-amber">Pending</span></td></tr>
+            <tr><td>#INV-4023</td><td>Evelyn Reed</td><td>General Consultation</td><td>$90</td><td><span class="badge badge-green">Paid</span></td></tr>
+            <tr><td>#INV-4024</td><td>Liam Torres</td><td>Dental Crown</td><td>$950</td><td><span class="badge badge-amber">Pending</span></td></tr>
+            <tr><td>#INV-4025</td><td>Aisha Patel</td><td>Braces Adjustment</td><td>$180</td><td><span class="badge badge-green">Paid</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="page-header"><div><h1 class="page-title">Settings</h1><p class="page-subtitle">Clinic system preferences</p></div></div>
+    <div class="section-card glass">
+      <div class="settings-grid">
+        <div class="setting-row">
+          <div><div class="setting-label">Email Notifications</div><div class="setting-desc">Send appointment reminders to patients</div></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')" aria-label="Toggle email notifications"></button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">SMS Reminders</div><div class="setting-desc">24-hour SMS alerts before appointments</div></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')" aria-label="Toggle SMS reminders"></button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Auto-Invoice Generation</div><div class="setting-desc">Generate invoices automatically on treatment completion</div></div>
+          <button class="toggle" onclick="this.classList.toggle('on')" aria-label="Toggle auto invoice"></button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Dark Mode</div><div class="setting-desc">Premium dark glassmorphism interface (active)</div></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')" aria-label="Toggle dark mode"></button>
+        </div>
+      </div>
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);">
+        DentalSync v2.1 · UNITAR International University · Academic Project · Demo data only
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- PATIENT DETAIL PANEL -->
+<aside class="detail-panel" id="detailPanel" aria-label="Patient detail" role="complementary">
+  <div class="detail-header">
+    <div class="detail-title">Patient Profile</div>
+    <button class="close-btn" onclick="closeDetail()" aria-label="Close detail panel">×</button>
+  </div>
+  <div class="detail-avatar-lg" id="detailAvatar">SJ</div>
+  <div class="detail-name" id="detailName">Sarah Jenkins</div>
+  <div class="detail-id" id="detailId">#PT-4021</div>
+  <div id="detailRows"></div>
+</aside>
+
+<!-- NEW APPOINTMENT MODAL -->
+<div class="modal-overlay" id="apptModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">📅 New Appointment</div>
+    <form id="apptForm" onsubmit="submitAppt(event)" novalidate>
+      <div class="form-row">
+        <label class="form-label" for="apptPatient">Patient Name *</label>
+        <input type="text" id="apptPatient" class="form-input" placeholder="e.g. John Smith" required />
+        <div class="form-error" id="err-patient">Patient name is required.</div>
+      </div>
+      <div class="form-row two-col">
+        <div>
+          <label class="form-label" for="apptDate">Date *</label>
+          <input type="date" id="apptDate" class="form-input" required />
+          <div class="form-error" id="err-date">Date is required.</div>
+        </div>
+        <div>
+          <label class="form-label" for="apptTime">Time *</label>
+          <input type="time" id="apptTime" class="form-input" required />
+          <div class="form-error" id="err-time">Time is required.</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="apptTreatment">Treatment *</label>
+        <select id="apptTreatment" class="form-select" required>
+          <option value="">— Select treatment —</option>
+          <option>General Consultation</option>
+          <option>Root Canal</option>
+          <option>Teeth Whitening</option>
+          <option>Dental Crown</option>
+          <option>Braces Adjustment</option>
+          <option>Tooth Extraction</option>
+          <option>Dental Cleaning</option>
+          <option>Cavity Filling</option>
+          <option>Dental X-Ray</option>
+        </select>
+        <div class="form-error" id="err-treatment">Please select a treatment.</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="apptDoctor">Assigned Doctor *</label>
+        <select id="apptDoctor" class="form-select" required>
+          <option value="">— Select doctor —</option>
+          <option>Dr. Alan Grant</option>
+          <option>Dr. Elena Rostova</option>
+          <option>Dr. Marcus Reid</option>
+        </select>
+        <div class="form-error" id="err-doctor">Please select a doctor.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeApptModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">✓ Book Appointment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Mobile sidebar backdrop -->
+<div id="sidebarBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:55;" onclick="closeSidebar()"></div>
+
+<a href="/" class="back-btn-pill" aria-label="Return to portfolio">
+  <span>←</span> Portfolio Home
+</a>
+
+<script>
+  // ================================================================
+  // DATA
+  // ================================================================
+  let appointments = [
+    { id: 1, time: '09:00 AM', patient: 'Sarah Jenkins', pid: '#PT-4021', treatment: 'Root Canal Checkup', doctor: 'Dr. Alan Grant', status: 'upcoming' },
+    { id: 2, time: '10:30 AM', patient: 'Marcus Chen', pid: '#PT-5521', treatment: 'Teeth Whitening', doctor: 'Dr. Elena Rostova', status: 'upcoming' },
+    { id: 3, time: '11:45 AM', patient: 'Evelyn Reed', pid: '#PT-2993', treatment: 'General Consultation', doctor: 'Dr. Alan Grant', status: 'pending' },
+    { id: 4, time: '02:00 PM', patient: 'Liam Torres', pid: '#PT-6610', treatment: 'Dental Crown', doctor: 'Dr. Marcus Reid', status: 'upcoming' },
+    { id: 5, time: '03:30 PM', patient: 'Aisha Patel', pid: '#PT-3387', treatment: 'Braces Adjustment', doctor: 'Dr. Elena Rostova', status: 'upcoming' },
+    { id: 6, time: '04:15 PM', patient: 'David Kim', pid: '#PT-7742', treatment: 'Tooth Extraction', doctor: 'Dr. Alan Grant', status: 'cancelled' }
+  ];
+
+  const patients = [
+    { name: 'Sarah Jenkins', pid: '#PT-4021', age: 32, lastVisit: '2026-08-11', treatment: 'Root Canal', status: 'Active', initials: 'SJ', details: { DOB: '1994-03-12', Phone: '+60 11-2345 6789', Email: 'sarah.j@email.com', Insurance: 'HealthFirst Plus', 'Total Visits': 14, 'Allergies': 'Penicillin' } },
+    { name: 'Marcus Chen', pid: '#PT-5521', age: 28, lastVisit: '2026-08-10', treatment: 'Whitening', status: 'Active', initials: 'MC', details: { DOB: '1998-07-24', Phone: '+60 12-8876 5432', Email: 'm.chen@email.com', Insurance: 'MediShield B', 'Total Visits': 6, Allergies: 'None' } },
+    { name: 'Evelyn Reed', pid: '#PT-2993', age: 45, lastVisit: '2026-07-28', treatment: 'Consultation', status: 'Pending', initials: 'ER', details: { DOB: '1981-11-05', Phone: '+60 16-5544 3321', Email: 'evelyn.r@email.com', Insurance: 'PremiumDent', 'Total Visits': 23, Allergies: 'Latex' } },
+    { name: 'Liam Torres', pid: '#PT-6610', age: 37, lastVisit: '2026-06-15', treatment: 'Crown', status: 'Active', initials: 'LT', details: { DOB: '1989-02-19', Phone: '+60 17-3391 2244', Email: 'liam.t@email.com', Insurance: 'HealthFirst', 'Total Visits': 9, Allergies: 'Ibuprofen' } },
+    { name: 'Aisha Patel', pid: '#PT-3387', age: 24, lastVisit: '2026-08-05', treatment: 'Braces', status: 'Active', initials: 'AP', details: { DOB: '2002-09-30', Phone: '+60 19-6621 8870', Email: 'aisha.p@email.com', Insurance: 'Student DenCare', 'Total Visits': 18, Allergies: 'None' } },
+    { name: 'David Kim', pid: '#PT-7742', age: 41, lastVisit: '2026-07-20', treatment: 'Extraction', status: 'Inactive', initials: 'DK', details: { DOB: '1985-06-11', Phone: '+60 14-7733 5566', Email: 'david.k@email.com', Insurance: 'BasicDent', 'Total Visits': 4, Allergies: 'Aspirin' } }
+  ];
+
+  const records = [
+    { rid: 'REC-001', patient: 'Sarah Jenkins', date: '2026-08-11', treatment: 'Root Canal Checkup', doctor: 'Dr. Alan Grant', notes: 'Post-treatment sensitivity normal. Follow-up in 30 days.' },
+    { rid: 'REC-002', patient: 'Marcus Chen', date: '2026-08-10', treatment: 'Teeth Whitening', doctor: 'Dr. Elena Rostova', notes: '2-shade improvement. Advised avoid staining foods 48h.' },
+    { rid: 'REC-003', patient: 'Evelyn Reed', date: '2026-07-28', treatment: 'General Consultation', doctor: 'Dr. Alan Grant', notes: 'Mild gingivitis detected. Prescribed chlorhexidine mouthwash.' },
+    { rid: 'REC-004', patient: 'Liam Torres', date: '2026-06-15', treatment: 'Dental Crown Prep', doctor: 'Dr. Marcus Reid', notes: 'Temporary crown fitted. Permanent crown scheduled in 2 weeks.' },
+    { rid: 'REC-005', patient: 'Aisha Patel', date: '2026-08-05', treatment: 'Braces Adjustment', doctor: 'Dr. Elena Rostova', notes: 'Archwire tightened. Excellent compliance. Next visit: 6 weeks.' }
+  ];
+
+  // ================================================================
+  // NAVIGATION
+  // ================================================================
+  let currentPage = 'overview';
+  let currentApptFilter = 'all';
+  let calYear, calMonth;
+
+  function navigate(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick').includes(`'${page}'`)) n.classList.add('active');
+    });
+    currentPage = page;
+    closeSidebar();
+    if (page === 'calendar') renderCalendar();
+    if (page === 'patients') renderPatients(patients);
+    if (page === 'records') renderRecords();
+    closeDetail();
+  }
+
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const bd = document.getElementById('sidebarBackdrop');
+    sb.classList.toggle('open');
+    bd.style.display = sb.classList.contains('open') ? 'block' : 'none';
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').style.display = 'none';
+  }
+
+  // ================================================================
+  // SEARCH
+  // ================================================================
+  function onSearch() {
+    const q = document.getElementById('globalSearch').value.toLowerCase().trim();
+    if (currentPage === 'overview') renderAppts(q);
+    else if (currentPage === 'patients') filterPatients(q);
+  }
+
+  // ================================================================
+  // APPOINTMENTS
+  // ================================================================
+  function renderAppts(searchQuery = '') {
+    const body = document.getElementById('apptBody');
+    let list = appointments;
+    if (currentApptFilter !== 'all') list = list.filter(a => a.status === currentApptFilter);
+    if (searchQuery) {
+      list = list.filter(a =>
+        a.patient.toLowerCase().includes(searchQuery) ||
+        a.pid.toLowerCase().includes(searchQuery) ||
+        a.treatment.toLowerCase().includes(searchQuery)
+      );
+    }
+    if (list.length === 0) {
+      body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="e-icon">📭</div><div>No appointments found.</div></div></td></tr>`;
+      return;
+    }
+    body.innerHTML = list.map(a => {
+      const badgeClass = a.status === 'upcoming' ? 'badge-green' : a.status === 'pending' ? 'badge-amber' : 'badge-red';
+      const initials = a.patient.split(' ').map(w => w[0]).join('').slice(0,2);
+      return `
+        <tr>
+          <td>${a.time}</td>
+          <td>
+            <div class="patient-cell">
+              <div class="patient-avatar">${initials}</div>
+              <div><div class="p-name">${a.patient}</div><div class="p-id">${a.pid}</div></div>
+            </div>
+          </td>
+          <td>${a.treatment}</td>
+          <td>${a.doctor}</td>
+          <td><span class="badge ${badgeClass}">${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span></td>
+          <td>
+            <button class="row-action" onclick="openPatientDetail('${a.patient}')">View</button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('stat-appts').textContent = appointments.filter(a => a.status === 'upcoming').length;
+    document.getElementById('stat-today').textContent = appointments.filter(a => a.status !== 'cancelled').length;
+  }
+
+  function filterAppts(filter, btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    currentApptFilter = filter;
+    renderAppts(document.getElementById('globalSearch').value.toLowerCase());
+  }
+
+  // ================================================================
+  // NEW APPOINTMENT MODAL
+  // ================================================================
+  function openNewApptModal() {
+    document.getElementById('apptModal').classList.add('open');
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('apptDate').value = today;
+    document.getElementById('apptTime').value = '09:00';
+  }
+  function closeApptModal() {
+    document.getElementById('apptModal').classList.remove('open');
+    document.getElementById('apptForm').reset();
+    document.querySelectorAll('.form-error').forEach(e => e.style.display = 'none');
+  }
+
+  function submitAppt(e) {
+    e.preventDefault();
+    let valid = true;
+    const fields = [
+      { id: 'apptPatient', err: 'err-patient' },
+      { id: 'apptDate', err: 'err-date' },
+      { id: 'apptTime', err: 'err-time' },
+      { id: 'apptTreatment', err: 'err-treatment' },
+      { id: 'apptDoctor', err: 'err-doctor' }
+    ];
+    fields.forEach(f => {
+      const val = document.getElementById(f.id).value.trim();
+      const errEl = document.getElementById(f.err);
+      if (!val) { errEl.style.display = 'block'; valid = false; }
+      else errEl.style.display = 'none';
+    });
+    if (!valid) return;
+
+    const rawTime = document.getElementById('apptTime').value;
+    const [h, m] = rawTime.split(':');
+    const hour = parseInt(h);
+    const timeStr = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`;
+    const patient = document.getElementById('apptPatient').value.trim();
+    const initials = patient.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+    appointments.unshift({
+      id: Date.now(),
+      time: timeStr,
+      patient,
+      pid: '#PT-' + Math.floor(Math.random() * 9000 + 1000),
+      treatment: document.getElementById('apptTreatment').value,
+      doctor: document.getElementById('apptDoctor').value,
+      status: 'upcoming'
+    });
+
+    closeApptModal();
+    renderAppts();
+  }
+
+  // ================================================================
+  // PATIENT DETAIL
+  // ================================================================
+  function openPatientDetail(name) {
+    const p = patients.find(pt => pt.name === name);
+    if (!p) return;
+    document.getElementById('detailAvatar').textContent = p.initials;
+    document.getElementById('detailName').textContent = p.name;
+    document.getElementById('detailId').textContent = p.pid;
+    const rows = Object.entries(p.details).map(([k,v]) =>
+      `<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v}</span></div>`
+    ).join('');
+    document.getElementById('detailRows').innerHTML = rows;
+    document.getElementById('detailPanel').classList.add('open');
+  }
+  function closeDetail() { document.getElementById('detailPanel').classList.remove('open'); }
+
+  // ================================================================
+  // PATIENTS PAGE
+  // ================================================================
+  function renderPatients(list) {
+    document.getElementById('patientCount').textContent = `${list.length} patients registered`;
+    const body = document.getElementById('patientBody');
+    if (list.length === 0) {
+      body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="e-icon">👤</div><div>No patients found.</div></div></td></tr>`;
+      return;
+    }
+    body.innerHTML = list.map(p => {
+      const badgeClass = p.status === 'Active' ? 'badge-green' : p.status === 'Pending' ? 'badge-amber' : 'badge-blue';
+      return `
+        <tr>
+          <td><div class="patient-cell"><div class="patient-avatar">${p.initials}</div><div><div class="p-name">${p.name}</div><div class="p-id">${p.pid}</div></div></div></td>
+          <td>${p.age}</td>
+          <td>${p.lastVisit}</td>
+          <td>${p.treatment}</td>
+          <td><span class="badge ${badgeClass}">${p.status}</span></td>
+          <td><button class="row-action" onclick="openPatientDetail('${p.name}')">View Profile</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function filterPatients(q) {
+    const filtered = patients.filter(p =>
+      p.name.toLowerCase().includes(q.toLowerCase()) ||
+      p.pid.toLowerCase().includes(q.toLowerCase()) ||
+      p.treatment.toLowerCase().includes(q.toLowerCase())
+    );
+    renderPatients(filtered);
+  }
+
+  // ================================================================
+  // RECORDS PAGE
+  // ================================================================
+  function renderRecords() {
+    document.getElementById('recordsBody').innerHTML = records.map(r => `
+      <tr>
+        <td style="font-family:monospace;font-size:0.82rem;color:var(--cyan);">${r.rid}</td>
+        <td><strong>${r.patient}</strong></td>
+        <td>${r.date}</td>
+        <td>${r.treatment}</td>
+        <td>${r.doctor}</td>
+        <td style="font-size:0.82rem;color:var(--text-muted);max-width:220px;">${r.notes}</td>
+      </tr>`).join('');
+  }
+
+  // ================================================================
+  // CALENDAR
+  // ================================================================
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function renderCalendar() {
+    const now = new Date();
+    if (!calYear) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
+    const label = `${MONTHS[calMonth]} ${calYear}`;
+    document.getElementById('calMonthLabel').textContent = label;
+
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = DAYS.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+    const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+    // Prev month fill
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const d = daysInPrev - i;
+      grid.innerHTML += `<div class="cal-day other-month"><div class="cal-date">${d}</div></div>`;
+    }
+
+    // Current month
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isToday = dateKey === todayKey;
+      const dayAppts = appointments.filter(a => {
+        // Simple: treat today as having today's appointments
+        if (isToday) return true;
+        return false;
+      });
+      const apptHtml = isToday
+        ? appointments.slice(0,3).map(a => `<div class="cal-appt">${a.time.split(' ')[0]} ${a.patient.split(' ')[0]}</div>`).join('')
+        : '';
+      grid.innerHTML += `<div class="cal-day${isToday ? ' today' : ''}"><div class="cal-date">${d}</div>${apptHtml}</div>`;
+    }
+  }
+
+  function prevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+  function nextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+
+  // ================================================================
+  // INIT
+  // ================================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    renderAppts();
+    renderPatients(patients);
+    renderRecords();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeApptModal(); closeDetail(); }
+  });
+
+  document.getElementById('apptModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('apptModal')) closeApptModal();
+  });
+</script>
+</body>
+</html>

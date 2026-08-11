@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TaskFlow Pro | Collaborative Agile Sprint & Kanban Suite</title>
+  <meta name="description" content="Interactive agile sprint Kanban board engineered in vanilla JavaScript with real-time card state progression, priority filtering, and modal creation." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --bg-column: rgba(255, 255, 255, 0.03);
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --bg-card-hover: rgba(45, 61, 86, 0.9);
+      --blue: #3b82f6;
+      --blue-light: #60a5fa;
+      --orange: #fb923c;
+      --emerald: #34d399;
+      --purple: #c084fc;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(59, 130, 246, 0.3);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font-family: inherit; }
+
+    .container { width: min(1300px, calc(100% - 40px)); margin: 0 auto; }
+
+    /* Nav */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-light));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 1.2rem;
+    }
+
+    .board-header {
+      padding: 30px 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .board-title h1 { font-size: 1.8rem; font-weight: 800; color: #fff; }
+    .board-actions { display: flex; gap: 12px; align-items: center; }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: 0;
+      transition: all .2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-blue {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+    .btn-blue:hover { background: #1d4ed8; }
+
+    /* Search & Filter Bar */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .search-task {
+      background: var(--bg-column);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: #fff;
+      outline: none;
+      min-width: 280px;
+    }
+    .priority-pills { display: flex; gap: 8px; }
+    .pill {
+      background: var(--bg-column);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pill.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+    /* Kanban Grid */
+    .kanban-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 60px;
+    }
+    .kanban-col {
+      background: var(--bg-column);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+    }
+    .col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .col-title { font-weight: 800; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .col-count {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+    }
+
+    .card-list { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .task-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      margin-bottom: 12px;
+      cursor: grab;
+      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+    .task-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border-color: var(--border-glow);
+    }
+    .task-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .tag-urgent { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .tag-high { background: rgba(249, 115, 22, 0.2); color: #fdba74; }
+    .tag-medium { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; }
+    .tag-low { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+
+    .task-name { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .task-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .assignee-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue);
+      display: grid;
+      place-items: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .move-btn {
+      background: rgba(255,255,255,0.08);
+      border: 0;
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .move-btn:hover { background: var(--blue); color: #fff; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 200;
+      display: none;
+      place-items: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: grid; }
+    .modal-box {
+      background: var(--bg-column);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      width: min(440px, 100%);
+      position: relative;
+    }
+
+    @media (max-width: 1000px) {
+      .kanban-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .kanban-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="brand">
+        <span class="brand-icon">📋</span> TaskFlow Pro
+      </a>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Sprint 14: 84% Completed</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Board Area -->
+  <main id="top" class="container">
+    <div class="board-header">
+      <div class="board-title">
+        <h1>Engineering & Design Sprint Board</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Vanilla JavaScript DOM State Machine · Click "→" to progress cards</p>
+      </div>
+      <div class="board-actions">
+        <button class="btn btn-blue" onclick="toggleTaskModal()">
+          + Create New Task
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <input type="text" class="search-task" id="taskSearch" placeholder="Search task name or assignee..." oninput="filterTasks()" />
+      <div class="priority-pills">
+        <button class="pill active" onclick="filterPriority('all', this)">All Priorities</button>
+        <button class="pill" onclick="filterPriority('urgent', this)">Urgent</button>
+        <button class="pill" onclick="filterPriority('high', this)">High</button>
+        <button class="pill" onclick="filterPriority('medium', this)">Medium</button>
+      </div>
+    </div>
+
+    <!-- 4-Column Kanban Grid -->
+    <div class="kanban-grid">
+      <!-- Backlog -->
+      <div class="kanban-col">
+        <div class="col-header">
+          <span class="col-title">📌 Backlog</span>
+          <span class="col-count" id="count-backlog">0</span>
+        </div>
+        <div class="card-list" id="list-backlog"></div>
+      </div>
+
+      <!-- In Progress -->
+      <div class="kanban-col">
+        <div class="col-header">
+          <span class="col-title">⚡ In Progress</span>
+          <span class="col-count" id="count-inprogress">0</span>
+        </div>
+        <div class="card-list" id="list-inprogress"></div>
+      </div>
+
+      <!-- Code Review -->
+      <div class="kanban-col">
+        <div class="col-header">
+          <span class="col-title">🔍 Code & QA Review</span>
+          <span class="col-count" id="count-review">0</span>
+        </div>
+        <div class="card-list" id="list-review"></div>
+      </div>
+
+      <!-- Done -->
+      <div class="kanban-col">
+        <div class="col-header">
+          <span class="col-title">✓ Completed</span>
+          <span class="col-count" id="count-done">0</span>
+        </div>
+        <div class="card-list" id="list-done"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Task Modal -->
+  <div class="modal-overlay" id="taskModal" onclick="if(event.target===this) toggleTaskModal()">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 1.25rem; color: #fff;">Create Sprint Task</h3>
+        <button onclick="toggleTaskModal()" style="background:none; border:0; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+
+      <form onsubmit="handleCreateTask(event)">
+        <div style="margin-bottom: 16px;">
+          <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:6px;">Task Title *</label>
+          <input type="text" id="newTaskTitle" placeholder="e.g. Implement visible focus ring" required style="width:100%; background:var(--bg-dark); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:#fff;" />
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:6px;">Priority Level</label>
+          <select id="newTaskPriority" style="width:100%; background:var(--bg-dark); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:#fff;">
+            <option value="urgent">Urgent Priority</option>
+            <option value="high" selected>High Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="low">Low Priority</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:6px;">Assignee</label>
+          <select id="newTaskAssignee" style="width:100%; background:var(--bg-dark); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:#fff;">
+            <option value="MT">Muugunthaan (Lead)</option>
+            <option value="AL">Alex Lim (Senior Front-End)</option>
+            <option value="ST">Sarah Tan (UI Designer)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-blue" style="width: 100%; justify-content: center;">
+          Add to Backlog
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function loadTasks() {
+      try { return JSON.parse(localStorage.getItem('taskflow_tasks')) || null; } catch { return null; }
+    }
+    function saveTasks() {
+      try { localStorage.setItem('taskflow_tasks', JSON.stringify(tasks)); } catch {}
+    }
+
+    let tasks = loadTasks() || [
+      { id: 1, title: 'Refactor CSS clamp typography tokens', priority: 'high', stage: 'backlog', assignee: 'MT' },
+      { id: 2, title: 'Audit mobile touch target hit areas (>44px)', priority: 'urgent', stage: 'backlog', assignee: 'ST' },
+      { id: 3, title: 'Build interactive SVG dashboard charts', priority: 'medium', stage: 'inprogress', assignee: 'MT' },
+      { id: 4, title: 'WordPress template hierarchy & layout review', priority: 'high', stage: 'inprogress', assignee: 'AL' },
+      { id: 5, title: 'Responsive layout QA & asset optimization audit', priority: 'urgent', stage: 'review', assignee: 'MT' },
+      { id: 6, title: 'Cross-browser rendering and layout verification', priority: 'low', stage: 'done', assignee: 'AL' }
+    ];
+
+
+    const stages = ['backlog', 'inprogress', 'review', 'done'];
+    let selectedPriority = 'all';
+
+    function renderBoard() {
+      const search = document.getElementById('taskSearch').value.toLowerCase();
+
+      stages.forEach(stage => {
+        const listEl = document.getElementById(`list-${stage}`);
+        const countEl = document.getElementById(`count-${stage}`);
+
+        const stageTasks = tasks.filter(t => {
+          const matchStage = t.stage === stage;
+          const matchPriority = selectedPriority === 'all' || t.priority === selectedPriority;
+          const matchSearch = t.title.toLowerCase().includes(search) || t.assignee.toLowerCase().includes(search);
+          return matchStage && matchPriority && matchSearch;
+        });
+
+        countEl.textContent = stageTasks.length;
+
+        if (stageTasks.length === 0) {
+          listEl.innerHTML = '<div style="text-align:center;padding:24px 12px;color:var(--text-muted);font-size:0.82rem;">No tasks here.</div>';
+        } else {
+        listEl.innerHTML = stageTasks.map(t => {
+          const currentStageIdx = stages.indexOf(t.stage);
+          const hasNext = currentStageIdx < stages.length - 1;
+          const hasPrev = currentStageIdx > 0;
+
+          return `
+            <div class="task-card">
+              <span class="task-tag tag-${t.priority}">${t.priority.toUpperCase()}</span>
+              <div class="task-name">${t.title}</div>
+              <div class="task-footer">
+                <div class="assignee-avatar">${t.assignee}</div>
+                <div style="display: flex; gap: 4px;">
+                  ${hasPrev ? `<button class="move-btn" onclick="moveTask(${t.id}, -1)">←</button>` : ''}
+                  ${hasNext ? `<button class="move-btn" onclick="moveTask(${t.id}, 1)">→</button>` : ''}
+                  <button class="move-btn" onclick="deleteTask(${t.id})" style="color:#f87171;border-color:rgba(248,113,113,0.3);" title="Delete task">✕</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+        }
+      });
+    }
+
+    function moveTask(id, direction) {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        const currentIdx = stages.indexOf(task.stage);
+        const newIdx = currentIdx + direction;
+        if (newIdx >= 0 && newIdx < stages.length) {
+          task.stage = stages[newIdx];
+          saveTasks();
+          renderBoard();
+        }
+      }
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      saveTasks();
+      renderBoard();
+    }
+
+    function filterTasks() {
+      renderBoard();
+    }
+
+    function filterPriority(priority, btn) {
+      document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      selectedPriority = priority;
+      renderBoard();
+    }
+
+    function toggleTaskModal() {
+      document.getElementById('taskModal').classList.toggle('open');
+    }
+
+    function handleCreateTask(e) {
+      e.preventDefault();
+      const title = document.getElementById('newTaskTitle').value.trim();
+      const priority = document.getElementById('newTaskPriority').value;
+      const assignee = document.getElementById('newTaskAssignee').value;
+
+      if (title) {
+        tasks.push({
+          id: Date.now(),
+          title,
+          priority,
+          stage: 'backlog',
+          assignee
+        });
+        document.getElementById('newTaskTitle').value = '';
+        saveTasks();
+        toggleTaskModal();
+        renderBoard();
+      }
+    }
+
+    // Initialize
+    renderBoard();
+  </script>
+
+  <!-- Back to Portfolio Pill -->
+  <a href="/" class="back-btn-pill" style="position: fixed; bottom: 24px; left: 24px; z-index: 150; background: rgba(5, 5, 5, 0.95); border: 1px solid var(--border); color: #fff; padding: 12px 22px; border-radius: 999px; font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); backdrop-filter: blur(10px); font-size: 0.9rem;">
+    <span>←</span> Portfolio Home
+  </a>
+</body>
+</html>
